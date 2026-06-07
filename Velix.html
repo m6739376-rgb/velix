@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velix Shorts - Premium Glassmorphism V6</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        :root {
+            --bg-base: #0A0A0A;         /* Noir profond */
+            --bg-glass: rgba(20, 20, 20, 0.6); /* Base Glassmorphism */
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --velix-blue: #00AFFF;      /* Bleu électrique */
+            --velix-blue-glow: rgba(0, 175, 255, 0.3);
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0A0;   
+            --radius-main: 14px;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            margin: 0; 
+            padding: 0;
+        }
+
+        body, html { 
+            width: 100%; 
+            height: 100%; 
+            background-color: var(--bg-base); 
+            color: var(--text-main); 
+            overflow: hidden; 
+        }
+
+        /* --- EFFETS GLOBAUX & ANIMATIONS --- */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-main);
+        }
+
+        /* --- COMPOSANT AUTHENTIFICATION --- */
+        .auth-container { 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100vw; height: 100vh; 
+            display: flex; justify-content: center; align-items: center; 
+            background: radial-gradient(circle at center, #111 0%, var(--bg-base) 100%); 
+            z-index: 9999; 
+        }
+        .auth-box { 
+            padding: 40px; 
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .brand-title { 
+            font-size: 36px; 
+            font-weight: 900; 
+            color: var(--velix-blue);
+            text-shadow: 0 0 15px var(--velix-blue-glow);
+            margin-bottom: 30px; 
+            letter-spacing: 1px;
+        }
+        .auth-box input, .chat-search-input, .form-container input { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 15px; 
+            background: rgba(255, 255, 255, 0.04); 
+            border: 1px solid var(--border-glass); 
+            border-radius: var(--radius-main); 
+            color: var(--text-main); 
+            font-size: 15px; 
+            transition: var(--transition-smooth);
+        }
+        .auth-box input:focus, .chat-search-input:focus {
+            outline: none;
+            border-color: var(--velix-blue);
+            box-shadow: 0 0 10px var(--velix-blue-glow);
+        }
+        .auth-box p { 
+            font-size: 13px; 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            margin-top: 15px; 
+            text-decoration: underline; 
+        }
+        
+        /* --- STYLES DES BOUTONS ARRONDIS --- */
+        .btn-primary { 
+            width: 100%; 
+            padding: 14px; 
+            background: var(--velix-blue); 
+            color: black; 
+            border: none; 
+            border-radius: var(--radius-main); 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-size: 16px; 
+            transition: var(--transition-smooth); 
+        }
+        .btn-primary:hover { 
+            opacity: 0.9; 
+            box-shadow: 0 0 15px var(--velix-blue-glow);
+        }
+        .btn-danger { 
+            background: #FF3B30; 
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: var(--radius-main); 
+            cursor: pointer; 
+            font-weight: 600; 
+        }
+        .btn-secondary { 
+            background: rgba(255, 255, 255, 0.06); 
+            color: white; 
+            border: 1px solid var(--border-glass); 
+            padding: 8px 16px; 
+            border-radius: var(--radius-main); 
+            cursor: pointer; 
+            transition: var(--transition-smooth);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- LAYOUT PLEIN ÉCRAN --- */
+        .main-wrapper { 
+            display: flex; 
+            width: 100vw; 
+            height: 100vh; 
+        }
+        .sidebar { 
+            width: 280px; 
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border-glass); 
+            display: flex; 
+            flex-direction: column; 
+            padding: 30px 20px; 
+            z-index: 10; 
+        }
+        .sidebar .logo { 
+            font-size: 28px; 
+            font-weight: 900; 
+            color: var(--velix-blue);
+            text-shadow: 0 0 10px var(--velix-blue-glow);
+            margin-bottom: 40px; 
+            padding-left: 10px;
+        }
+        .nav-section { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+        }
+        .nav-item { 
+            padding: 14px 18px; 
+            color: var(--text-muted); 
+            font-weight: 600; 
+            cursor: pointer; 
+            border-radius: var(--radius-main); 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            position: relative; 
+            font-size: 16px; 
+            transition: var(--transition-smooth);
+        }
+        .nav-item i { 
+            color: var(--text-muted); 
+            font-size: 18px;
+            transition: var(--transition-smooth);
+        }
+        .nav-item:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .nav-item.active { 
+            color: var(--text-main); 
+            background: rgba(0, 175, 255, 0.1); 
+            border-left: 4px solid var(--velix-blue); 
+        }
+        .nav-item.active i { 
+            color: var(--velix-blue); 
+        }
+        
+        .notif-badge { 
+            position: absolute; 
+            right: 15px; top: 50%; 
+            transform: translateY(-50%); 
+            background: var(--velix-blue); 
+            color: black; 
+            font-size: 11px; 
+            padding: 2px 7px; 
+            border-radius: 20px; 
+            font-weight: 700; 
+            display: none; 
+        }
+
+        .user-tag { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding-top: 20px; 
+            border-top: 1px solid var(--border-glass); 
+            font-weight: bold; 
+            position: relative; 
+        }
+        .dropdown-menu { 
+            display: none; 
+            position: absolute; 
+            bottom: 65px; right: 0; 
+            width: 200px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7); 
+            z-index: 100; 
+            padding: 6px;
+        }
+        .dropdown-item { 
+            padding: 12px; 
+            font-size: 14px; 
+            cursor: pointer; 
+            color: var(--text-main); 
+            border-radius: 8px;
+            transition: var(--transition-smooth);
+        }
+        .dropdown-item:hover { 
+            background: rgba(255,255,255,0.08); 
+            color: var(--velix-blue);
+        }
+
+        .content-viewport { 
+            flex: 1; 
+            height: 100%; 
+            position: relative; 
+            background: var(--bg-base); 
+        }
+        .screen-view { 
+            width: 100%; 
+            height: 100%; 
+            display: none; 
+            overflow-y: auto; 
+        }
+        .screen-view.active-view { 
+            display: block; 
+        }
+
+        /* --- FLUX STYLE TIKTOK COMPLET --- */
+        #view-home { 
+            overflow-y: scroll; 
+            scroll-snap-type: y mandatory; 
+            height: 100vh; 
+            background: #000; 
+        }
+        .short-container { 
+            position: relative; 
+            width: 100%; 
+            height: 100vh; 
+            scroll-snap-align: start; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .short-video-wrapper { 
+            position: relative; 
+            width: 100%; 
+            max-width: 480px; 
+            height: 100%; 
+            background: #000; 
+            display: flex; 
+            align-items: center; 
+        }
+        .short-video-wrapper video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+        }
+        
+        .short-sidebar-actions { 
+            position: absolute; 
+            right: 15px; 
+            bottom: 100px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; 
+            align-items: center; 
+            z-index: 5; 
+        }
+        .action-icon-btn { 
+            position: relative; 
+            background: rgba(20, 20, 20, 0.6); 
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass); 
+            width: 52px; height: 52px; 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; align-items: center; 
+            color: white; 
+            font-size: 20px; 
+            cursor: pointer; 
+            transition: var(--transition-smooth);
+        }
+        .action-icon-btn:hover {
+            transform: scale(1.08);
+        }
+        .action-icon-btn.liked-active { 
+            color: var(--velix-blue); 
+            text-shadow: 0 0 12px var(--velix-blue); 
+        }
+        
+        /* Bouton Suivre Style TikTok */
+        .follow-badge-btn { 
+            position: absolute; 
+            bottom: -5px; 
+            background: var(--velix-blue); 
+            width: 22px; height: 22px; 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; align-items: center; 
+            font-size: 11px; 
+            color: black; 
+            border: 2px solid #000; 
+            transition: var(--transition-smooth);
+        }
+        .follow-badge-btn.following-active { 
+            background: #34C759; 
+            color: white;
+        }
+
+        .short-meta-bottom { 
+            position: absolute; 
+            left: 20px; 
+            bottom: 30px; 
+            right: 90px; 
+            z-index: 5; 
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9); 
+        }
+        
+        /* Zone Commentaires TikTok Réaliste */
+        .comments-overlay { 
+            position: absolute; 
+            bottom: 0; left: 0; right: 0; 
+            height: 65%; 
+            display: none; 
+            flex-direction: column; 
+            padding: 25px; 
+            z-index: 10; 
+            border-top-left-radius: 20px; 
+            border-top-right-radius: 20px; 
+        }
+        .comments-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            font-weight: 700; 
+            font-size: 16px;
+        }
+        .comments-list-container { 
+            flex: 1; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px; 
+            margin-bottom: 15px; 
+        }
+        .comment-item { 
+            display: flex; 
+            gap: 12px; 
+            font-size: 14px; 
+        }
+        .comment-avatar { 
+            width: 36px; height: 36px; 
+            border-radius: 50%; 
+            background: rgba(255,255,255,0.1); 
+            display: flex; 
+            justify-content: center; align-items: center; 
+            font-weight: 700; 
+            font-size: 13px; 
+        }
+        .comment-content-box { 
+            flex: 1; 
+        }
+        .comment-author { 
+            font-weight: 600; 
+            margin-bottom: 3px; 
+            color: var(--text-muted); 
+        }
+        .comment-input-row { 
+            display: flex; 
+            gap: 12px; 
+            border-top: 1px solid var(--border-glass); 
+            padding-top: 15px; 
+        }
+
+        /* --- STUDIO DE CRÉATION (VIDÉO EXCLUSIVE) --- */
+        .form-container { 
+            max-width: 750px; 
+            padding: 35px; 
+            margin: 40px auto; 
+        }
+        .studio-layout { 
+            display: flex; 
+            gap: 25px; 
+            margin-top: 25px; 
+        }
+        .camera-box { 
+            width: 240px; height: 340px; 
+            background: #000; 
+            border-radius: var(--radius-main); 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; align-items: center; 
+            border: 1px solid var(--border-glass); 
+            overflow: hidden; 
+        }
+        .studio-fields { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+        }
+        .camera-modes { 
+            display: flex; 
+            justify-content: center; 
+            gap: 12px; 
+            margin-bottom: 15px; 
+        }
+        .mode-btn { 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid var(--border-glass); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+        .mode-btn.active-mode { 
+            background: var(--velix-blue); 
+            color: black;
+            border: none; 
+            box-shadow: 0 0 10px var(--velix-blue-glow);
+        }
+        .live-indicator { 
+            position: absolute; 
+            top: 15px; left: 15px; 
+            background: #FF3B30; 
+            padding: 4px 10px; 
+            border-radius: 6px; 
+            font-size: 11px; 
+            font-weight: 700; 
+            display: none; 
+            animation: blink 1.5s infinite; 
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* --- SYSTÈME DE MESSAGERIE --- */
+        .chat-layout { 
+            display: flex; 
+            margin: 20px; 
+            height: calc(100vh - 40px); 
+            overflow: hidden; 
+        }
+        .chat-sidebar { 
+            width: 300px; 
+            border-right: 1px solid var(--border-glass); 
+            padding: 25px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+        }
+        .chat-users-list { 
+            flex: 1; 
+            overflow-y: auto; 
+        }
+        .chat-peer-item { 
+            padding: 14px 18px; 
+            border-radius: var(--radius-main); 
+            cursor: pointer; 
+            margin-bottom: 8px; 
+            color: var(--text-muted); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            transition: var(--transition-smooth);
+        }
+        .chat-peer-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-main);
+        }
+        .chat-peer-item.active-peer { 
+            background: rgba(0, 175, 255, 0.08); 
+            color: var(--text-main); 
+            border-left: 4px solid var(--velix-blue); 
+        }
+        .chat-main { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            background: rgba(5, 5, 5, 0.4); 
+        }
+        .chat-header { 
+            padding: 20px 25px; 
+            border-bottom: 1px solid var(--border-glass); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .chat-messages { 
+            flex: 1; 
+            padding: 25px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 14px; 
+        }
+        .msg-bubble { 
+            max-width: 65%; 
+            padding: 12px 18px; 
+            border-radius: 18px; 
+            white-space: pre-line; 
+            font-size: 15px;
+        }
+        .msg-bubble.me { 
+            background: var(--velix-blue); 
+            color: black;
+            font-weight: 500;
+            align-self: flex-end; 
+            border-bottom-right-radius: 4px;
+        }
+        .msg-bubble.other { 
+            background: rgba(255, 255, 255, 0.06); 
+            color: var(--text-main);
+            align-self: flex-start; 
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-glass);
+        }
+        .chat-input-row { 
+            padding: 25px; 
+            display: flex; 
+            gap: 15px; 
+        }
+
+        /* --- PROFIL REPRENANT LES COMPTEURS --- */
+        .profile-card-container { 
+            max-width: 850px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+        }
+        .profile-header-tiktok { 
+            display: flex; 
+            align-items: center; 
+            gap: 35px; 
+            margin-bottom: 35px; 
+        }
+        .profile-avatar-img { 
+            width: 115px; height: 115px; 
+            border-radius: 50%; 
+            background: rgba(255,255,255,0.05); 
+            border: 2px solid var(--border-glass); 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 38px; font-weight: 700; 
+            cursor: pointer; 
+        }
+        .profile-info-tiktok { 
+            flex: 1; 
+        }
+        
+        .profile-stats-tiktok { 
+            display: flex; 
+            gap: 30px; 
+            margin-bottom: 25px; 
+            border-bottom: 1px solid var(--border-glass); 
+            padding-bottom: 20px; 
+        }
+        .stat-item-tk { 
+            font-size: 15px; 
+            color: var(--text-muted); 
+        }
+        .stat-item-tk strong { 
+            color: white; 
+            font-size: 20px; 
+            margin-right: 5px; 
+        }
+
+        .videos-grid-tk { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 8px; 
+        }
+        .grid-video-card { 
+            aspect-ratio: 3/4; 
+            background: #000; 
+            border-radius: 8px;
+            border: 1px solid var(--border-glass); 
+            position: relative; 
+            overflow: hidden; 
+            cursor: pointer; 
+            transition: var(--transition-smooth);
+        }
+        .grid-video-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--velix-blue);
+        }
+        .grid-video-card video { 
+            width: 100%; height: 100%; 
+            object-fit: cover; 
+            pointer-events: none; 
+        }
+
+        /* --- FENÊTRES MODALES ET DRAWERS --- */
+        .video-modal-view { 
+            display: none; 
+            position: fixed; 
+            top:0; left:0; 
+            width:100vw; height:100vh; 
+            background: rgba(0,0,0,0.95); 
+            z-index: 20000; 
+            justify-content: center; align-items: center; 
+        }
+        .video-modal-content { 
+            width: 100%; 
+            max-width: 440px; 
+            height: 85vh; 
+            background: #000; 
+            display: flex; 
+            flex-direction: column; 
+            border-radius: var(--radius-main); 
+            overflow: hidden; 
+            border: 1px solid var(--border-glass); 
+        }
+        .video-modal-content video { 
+            flex: 1; 
+            width: 100%; 
+            object-fit: cover; 
+        }
+        .video-modal-toolbar { 
+            padding: 20px; 
+            background: #0A0A0A; 
+            display: flex; 
+            justify-content: space-between; align-items: center; 
+        }
+
+        .settings-drawer { 
+            position: fixed; 
+            top: 0; right: -420px; 
+            width: 420px; height: 100vh; 
+            z-index: 10005; 
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            padding: 35px; 
+            overflow-y: auto; 
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5); 
+        }
+        .settings-drawer.drawer-open { 
+            right: 0; 
+        }
+        .drawer-header { 
+            display: flex; 
+            justify-content: space-between; align-items: center; 
+            margin-bottom: 35px; 
+            border-bottom: 1px solid var(--border-glass); 
+            padding-bottom: 15px; 
+        }
+
+        .accounts-modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.85); 
+            z-index: 10000; 
+            justify-content: center; align-items: center; 
+        }
+        .accounts-box { 
+            padding: 35px; 
+            border-radius: var(--radius-main); 
+            width: 360px; 
+            text-align: center; 
+        }
+
+        /* --- SECTION CARTE --- */
+        #view-map {
+            padding: 20px;
+        }
+        .map-layout-wrapper {
+            display: flex;
+            width: 100%;
+            height: calc(100vh - 40px);
+            gap: 20px;
+        }
+        .map-side-panel {
+            width: 320px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .map-render-zone {
+            flex: 1;
+            border-radius: var(--radius-main);
+            border: 1px solid var(--border-glass);
+            overflow: hidden;
+        }
+
+        /* --- ADMIN PANEL --- */
+        .admin-dashboard { padding: 40px; max-width: 1100px; margin: 0 auto; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .admin-table th, .admin-table td { padding: 16px; border-bottom: 1px solid var(--border-glass); text-align: left; font-size: 14px; }
+        .admin-table th { background: rgba(255,255,255,0.03); color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <div id="auth-gateway" class="auth-container">
+        <div class="auth-box glass-panel">
+            <h1 class="brand-title"><i class="fa-solid fa-bolt"></i> VELIX</h1>
+            <div id="login-module">
+                <h2 style="margin-bottom:20px; font-weight:600;">Connexion</h2>
+                <input type="text" id="login-identity" placeholder="Identifiant ou E-mail">
+                <input type="password" id="login-password" placeholder="Mot de passe">
+                <button class="btn-primary" onclick="processLogin()">Se connecter</button>
+                <p onclick="switchAuthView(false)">Créer un nouveau compte</p>
+            </div>
+            <div id="register-module" style="display:none;">
+                <h2 style="margin-bottom:20px; font-weight:600;">Inscription</h2>
+                <input type="text" id="reg-username" placeholder="Identifiant unique (@nom)">
+                <input type="text" id="reg-nickname" placeholder="Surnom (Pseudo obligatoire)">
+                <input type="email" id="reg-email" placeholder="Adresse e-mail">
+                <input type="password" id="reg-password" placeholder="Mot de passe">
+                <button class="btn-primary" onclick="processRegister()">S'inscrire</button>
+                <p onclick="switchAuthView(true)">Déjà membre ? Connexion</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <div class="logo"><i class="fa-solid fa-bolt"></i> VELIX</div>
+            <div class="nav-section">
+                <div class="nav-item active" id="nav-home" onclick="navigateTo('home')"><i class="fa-solid fa-house"></i> Pour toi</div>
+                <div class="nav-item" id="nav-upload" onclick="navigateTo('upload')"><i class="fa-solid fa-circle-plus"></i> Publier</div>
+                <div class="nav-item" id="nav-map" onclick="navigateTo('map')"><i class="fa-solid fa-location-dot"></i> Carte</div>
+                <div class="nav-item" id="nav-chat" onclick="navigateTo('chat')">
+                    <i class="fa-solid fa-message"></i> Messages
+                    <span id="global-badge" class="notif-badge">0</span>
+                </div>
+                <div class="nav-item" id="nav-profile" onclick="navigateTo('profile')"><i class="fa-solid fa-user"></i> Profil</div>
+                <div class="nav-item" id="nav-admin" onclick="navigateTo('admin')" style="display:none;"><i class="fa-solid fa-shield-halved"></i> Admin</div>
+            </div>
+            <div class="user-tag">
+                <span id="global-username-display" style="color:var(--velix-blue);">@invite</span>
+                <span style="cursor:pointer; padding:5px; font-size:18px;" onclick="toggleDropdownMenu()"><i class="fa-solid fa-ellipsis"></i></span>
+                <div class="dropdown-menu glass-panel" id="user-dropdown">
+                    <div class="dropdown-item" onclick="disconnectSession()"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</div>
+                    <div class="dropdown-item" onclick="openSwitchAccountModal()"><i class="fa-solid fa-user-gear"></i> Changer de compte</div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content-viewport">
+            <section id="view-home" class="screen-view active-view"></section>
+
+            <section id="view-upload" class="screen-view">
+                <div class="form-container glass-panel">
+                    <h2 style="font-weight:700; margin-bottom:5px;">Studio de création</h2>
+                    <p style="color:var(--text-muted); font-size:14px; margin-bottom:25px;">Seul le format vidéo est autorisé sur Velix Shorts.</p>
+                    
+                    <div class="studio-layout">
+                        <div class="camera-box" id="camera-frame-box">
+                            <div class="live-indicator" id="live-indicator-label">LIVE</div>
+                            <i class="fa-solid fa-clapperboard fa-3x" style="color:rgba(255,255,255,0.1); margin-bottom:15px;"></i>
+                            <span style="font-size:13px; color:var(--text-muted); text-align:center; padding:0 15px;" id="studio-placeholder-text">Parcourez vos fichiers pour importer un Short</span>
+                            <div style="position:absolute; bottom:15px; background:var(--velix-blue); width:36px; height:36px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; color:black;" onclick="triggerFilePicker()">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
+                        </div>
+
+                        <div class="studio-fields">
+                            <div class="camera-modes">
+                                <button class="mode-btn active-mode" id="mode-video" onclick="setStudioMode('video')">Vidéo Short</button>
+                                <button class="mode-btn" id="mode-stream" onclick="setStudioMode('stream')">Partage d'écran LIVE</button>
+                            </div>
+
+                            <div id="studio-upload-fields">
+                                <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px; color:var(--text-muted);">Légende de votre Short</label>
+                                <input type="text" id="video-title-input" placeholder="Décrivez votre vidéo...">
+                                <input type="file" id="video-file-input" accept="video/*" style="display:none;" onchange="handleStudioFileSelection(event)">
+                            </div>
+
+                            <div id="studio-live-fields" style="display:none;">
+                                <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Diffusez l'intégralité de votre écran à la communauté en direct.</p>
+                                <button class="btn-primary" style="background:#FF3B30; color:white;" onclick="startScreenShareBroadcast()"><i class="fa-solid fa-desktop"></i> Lancer le partage d'écran</button>
+                                <button class="btn-secondary" style="width:100%; margin-top:10px; display:none;" id="btn-stop-live" onclick="stopScreenShareBroadcast()">Interrompre le LIVE</button>
+                            </div>
+
+                            <div style="display:flex; gap:12px; margin-top:15px;" id="studio-action-row">
+                                <button class="btn-secondary" style="flex:1;" onclick="navigateTo('home')">Annuler</button>
+                                <button class="btn-primary" style="flex:1;" onclick="publishMediaContent()">Mettre en ligne</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-map" class="screen-view">
+                <div class="map-layout-wrapper">
+                    <div class="map-side-panel glass-panel">
+                        <h3 style="font-weight:700;"><i class="fa-solid fa-earth-europe"></i> Explorer Velix</h3>
+                        <p style="font-size:13px; color:var(--text-muted);">Visualisez la position géographique des membres de la communauté en temps réel.</p>
+                        <hr style="border-color:var(--border-glass);">
+                        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; color:var(--text-muted); font-size:14px; text-align:center;">
+                            <i class="fa-solid fa-location-crosshairs fa-2x" style="margin-bottom:10px; color:var(--velix-blue);"></i>
+                            Géolocalisation activée
+                        </div>
+                    </div>
+                    <div class="map-render-zone" id="map-container"></div>
+                </div>
+            </section>
+
+            <section id="view-chat" class="screen-view">
+                <div class="chat-layout glass-panel">
+                    <div class="chat-sidebar">
+                        <h3 style="font-weight:700; margin-bottom:5px;">Discussions</h3>
+                        <input type="text" id="chat-search-input" class="chat-search-input" placeholder="Rechercher un membre..." oninput="refreshChatSystem()">
+                        <div class="chat-users-list" id="chat-users-list-target"></div>
+                    </div>
+                    <div class="chat-main">
+                        <div class="chat-header" id="chat-header-actions" style="display:none; background: rgba(255,255,255,0.01);">
+                            <span id="chat-current-peer-name" style="font-weight:700; font-size:16px;">Discussion</span>
+                        </div>
+                        <div class="chat-messages" id="chat-messages-box-target"></div>
+                        <div class="chat-input-row">
+                            <input type="text" id="chat-message-payload" class="chat-search-input" style="flex:1; margin:0;" placeholder="Écrire un message..." onkeydown="handleChatKeyDown(event)">
+                            <button class="btn-primary" style="width:auto; padding:0 25px;" onclick="dispatchPrivateMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-profile" class="screen-view">
+                <div class="profile-card-container">
+                    <div class="profile-header-tiktok">
+                        <div class="profile-avatar-img" id="profile-avatar-display">V</div>
+                        <div class="profile-info-tiktok">
+                            <h2 id="profile-display-username" style="font-size:26px; font-weight:800; margin-bottom:4px;">@username</h2>
+                            <h3 id="profile-display-fullname" style="font-size:16px; font-weight:500; color:var(--text-muted); margin-bottom:15px;">Mon Surnom</h3>
+                            <div>
+                                <button class="btn-secondary" onclick="openSettingsDrawer()"><i class="fa-solid fa-sliders" style="margin-right:8px;"></i>Réglages du profil</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-stats-tiktok">
+                        <div class="stat-item-tk"><strong id="profile-followers-count">0</strong> abonnés</div>
+                        <div class="stat-item-tk"><strong id="profile-following-count">0</strong> abonnements</div>
+                    </div>
+
+                    <h3 style="font-weight:700; margin-bottom:15px; font-size:16px; letter-spacing:0.5px;">MES CRÉATIONS</h3>
+                    <div class="videos-grid-tk" id="profile-videos-grid-target"></div>
+                </div>
+            </section>
+
+            <section id="view-admin" class="screen-view">
+                <div class="admin-dashboard">
+                    <h1 style="color:var(--velix-blue); font-weight:900; margin-bottom:10px;"><i class="fa-solid fa-user-shield"></i> Panneau d'administration</h1>
+                    <div class="glass-panel" style="padding:25px; margin-top:20px;">
+                        <h2 style="font-size:18px; font-weight:700;">Contrôle de la communauté</h2>
+                        <table class="admin-table">
+                            <thead>
+                                <tr><th>ID</th><th>Identifiant</th><th>Surnom</th><th>Rôle</th></tr>
+                            </thead>
+                            <tbody id="admin-users-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="video-modal-view" id="personal-video-modal">
+        <div class="video-modal-content">
+            <video id="modal-video-player" controls autoplay loop></video>
+            <div class="video-modal-toolbar">
+                <button class="btn-secondary" onclick="closePersonalVideoModal()">Fermer</button>
+                <button class="btn-danger" id="btn-delete-current-video"><i class="fa-solid fa-trash-can"></i> Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-drawer glass-panel" id="app-settings-drawer">
+        <div class="drawer-header">
+            <h3 style="font-weight:700;"><i class="fa-solid fa-gear" style="color:var(--velix-blue);"></i> Mon Profil</h3>
+            <span style="font-size:24px; cursor:pointer;" onclick="closeSettingsDrawer()">&times;</span>
+        </div>
+        <div style="margin-bottom:20px;">
+            <label style="display:block; font-size:13px; color:var(--text-muted); margin-bottom:8px;">Changer votre Surnom (Pseudo) :</label>
+            <input type="text" id="edit-profile-nickname" class="chat-search-input" style="margin-bottom:20px;">
+        </div>
+        <button class="btn-primary" style="margin-bottom:15px;" onclick="updateUserProfileData()">Sauvegarder</button>
+        <button class="btn-secondary" style="width:100%; border-color:#FF3B30; color:#FF3B30;" onclick="closeSettingsDrawer(); disconnectSession();">Se déconnecter</button>
+    </div>
+
+    <div class="accounts-modal" id="accounts-switch-modal">
+        <div class="accounts-box glass-panel">
+            <h3 style="font-weight:700; margin-bottom:20px;">Sessions enregistrées</h3>
+            <div id="local-accounts-list" style="margin-bottom:20px;"></div>
+            <button class="btn-secondary" style="width:100%; margin-bottom:10px;" onclick="initiateAddAccount()">Ajouter un compte</button>
+            <button class="btn-primary" style="background:rgba(255,255,255,0.08); color:white;" onclick="closeSwitchAccountModal()">Fermer</button>
+        </div>
+    </div>
+
+    <script>
+        let databaseInstance = null;
+        let sessionActiveUser = null;
+        let selectedChatPeerId = null;
+        let mapInstance = null;
+        let activeStudioMode = 'video';
+        let localRegisteredAccounts = []; 
+        let liveStreamMediaObject = null;
+        const BOT_ID = 999999;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            establishIndexedDBConnection();
+            loadAccountsFromLocalStorage();
+        });
+
+        function establishIndexedDBConnection() {
+            const dbRequest = indexedDB.open('VelixSupremeV6DB', 6);
+            dbRequest.onupgradeneeded = function(event) {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('users')) {
+                    const userStore = db.createObjectStore('users', { keyPath: 'id', autoIncrement: true });
+                    userStore.createIndex('username', 'username', { unique: true });
+                }
+                if (!db.objectStoreNames.contains('videos')) db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
+                if (!db.objectStoreNames.contains('messages')) db.createObjectStore('messages', { keyPath: 'id', autoIncrement: true });
+                if (!db.objectStoreNames.contains('comments')) db.createObjectStore('comments', { keyPath: 'id', autoIncrement: true });
+            };
+            dbRequest.onsuccess = function(event) {
+                databaseInstance = event.target.result;
+                seedAdminAccount();
+            };
+        }
+
+        async function seedAdminAccount() {
+            const transaction = databaseInstance.transaction(['users'], 'readwrite');
+            const store = transaction.objectStore('users');
+            const countReq = store.count();
+            countReq.onsuccess = async function() {
+                if (countReq.result === 0) {
+                    const hashed = await hashStringSHA256('mohamed');
+                    store.add({ username: 'admin', nickname: 'Fondateur', email: 'admin@velix.tv', password: hashed, isAdmin: true, followersList: [], followingList: [] });
+                }
+            };
+        }
+
+        function loadAccountsFromLocalStorage() {
+            const saved = localStorage.getItem('velix_local_accounts_v6');
+            if(saved) localRegisteredAccounts = JSON.parse(saved);
+        }
+
+        function saveAccountsToLocalStorage() {
+            localStorage.setItem('velix_local_accounts_v6', JSON.stringify(localRegisteredAccounts));
+        }
+
+        async function hashStringSHA256(stringPayload) {
+            const msgUint8 = new TextEncoder().encode(stringPayload);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function navigateTo(targetViewId) {
+            document.querySelectorAll('.screen-view').forEach(v => v.classList.remove('active-view'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            const selectedView = document.getElementById(`view-${targetViewId}`);
+            if(selectedView) selectedView.classList.add('active-view');
+            if(document.getElementById(`nav-${targetViewId}`)) document.getElementById(`nav-${targetViewId}`).classList.add('active');
+            
+            document.querySelectorAll('video').forEach(v => { if(v.id !== 'modal-video-player') v.pause(); });
+            document.getElementById('user-dropdown').style.display = 'none';
+            closeSettingsDrawer();
+
+            if (targetViewId === 'home') refreshShortsFeed();
+            if (targetViewId === 'chat') refreshChatSystem();
+            if (targetViewId === 'profile') displayPersonalProfile();
+            if (targetViewId === 'admin') refreshAdminPanel();
+            if (targetViewId === 'map') triggerMapDeployment();
+        }
+
+        function toggleDropdownMenu() {
+            const menu = document.getElementById('user-dropdown');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function switchAuthView(showLogin) {
+            document.getElementById('login-module').style.display = showLogin ? 'block' : 'none';
+            document.getElementById('register-module').style.display = showLogin ? 'none' : 'block';
+        }
+
+        async function processRegister() {
+            const username = document.getElementById('reg-username').value.trim().toLowerCase();
+            const nickname = document.getElementById('reg-nickname').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+
+            if(!username || !nickname || !email || !password) return alert("Le pseudo et tous les autres champs sont obligatoires.");
+            const encryptedPassword = await hashStringSHA256(password);
+            const transaction = databaseInstance.transaction(['users', 'messages'], 'readwrite');
+            const userStore = transaction.objectStore('users');
+            const messageStore = transaction.objectStore('messages');
+            
+            const addReq = userStore.add({ username, nickname, email, password: encryptedPassword, isAdmin: false, followersList: [], followingList: [] });
+            addReq.onsuccess = (e) => { 
+                const newUserId = e.target.result;
+                messageStore.add({ senderId: BOT_ID, receiverId: newUserId, text: `Bienvenue sur Velix ! Découvrez notre système exclusif de partage d'écran communautaire en LIVE.`, read: false });
+                if(!localRegisteredAccounts.includes(username)) {
+                    localRegisteredAccounts.push(username);
+                    saveAccountsToLocalStorage();
+                }
+                alert("Inscription validée ! Vous pouvez vous connecter."); 
+                switchAuthView(true); 
+            };
+            addReq.onerror = () => alert("Identifiant déjà utilisé.");
+        }
+
+        async function processLogin() {
+            const identity = document.getElementById('login-identity').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+
+            const encryptedAttemptPassword = await hashStringSHA256(password);
+            const transaction = databaseInstance.transaction(['users'], 'readonly');
+            transaction.objectStore('users').openCursor().onsuccess = function(e) {
+                const cursor = e.target.result;
+                if(cursor) {
+                    const user = cursor.value;
+                    if((user.username === identity || user.email === identity) && user.password === encryptedAttemptPassword) {
+                        sessionActiveUser = user;
+                        document.getElementById('auth-gateway').style.display = 'none';
+                        document.getElementById('global-username-display').textContent = `@${user.username}`;
+                        if(!localRegisteredAccounts.includes(user.username)) {
+                            localRegisteredAccounts.push(user.username);
+                            saveAccountsToLocalStorage();
+                        }
+                        if(user.isAdmin) document.getElementById('nav-admin').style.display = 'flex';
+                        checkUnreadNotifications();
+                        navigateTo('home');
+                        return;
+                    }
+                    cursor.continue();
+                } else {
+                    if(!sessionActiveUser) alert("Identifiants incorrects.");
+                }
+            };
+        }
+
+        function disconnectSession() {
+            sessionActiveUser = null;
+            document.getElementById('nav-admin').style.display = 'none';
+            document.getElementById('auth-gateway').style.display = 'flex';
+        }
+
+        function openSwitchAccountModal() {
+            document.getElementById('user-dropdown').style.display = 'none';
+            const modal = document.getElementById('accounts-switch-modal');
+            const listContainer = document.getElementById('local-accounts-list');
+            listContainer.innerHTML = '';
+            modal.style.display = 'flex';
+
+            localRegisteredAccounts.forEach(username => {
+                const row = document.createElement('div');
+                row.className = 'account-selector-item chat-peer-item';
+                row.style.background = "rgba(255,255,255,0.04)";
+                row.textContent = `@${username}`;
+                row.onclick = () => { switchActiveSessionDirectly(username); };
+                listContainer.appendChild(row);
+            });
+        }
+
+        function closeSwitchAccountModal() { document.getElementById('accounts-switch-modal').style.display = 'none'; }
+        function initiateAddAccount() { closeSwitchAccountModal(); disconnectSession(); }
+
+        function switchActiveSessionDirectly(targetUsername) {
+            const index = databaseInstance.transaction(['users'], 'readonly').objectStore('users').index('username');
+            index.get(targetUsername).onsuccess = (req) => {
+                if(req.target.result) {
+                    sessionActiveUser = req.target.result;
+                    document.getElementById('auth-gateway').style.display = 'none';
+                    document.getElementById('global-username-display').textContent = `@${sessionActiveUser.username}`;
+                    closeSwitchAccountModal();
+                    checkUnreadNotifications();
+                    navigateTo('home');
+                }
+            };
+        }
+
+        /* Logic TikTok : Flux, Abonnements, Avance/Recul Vidéo, Commentaires */
+        function refreshShortsFeed() {
+            const target = document.getElementById('view-home');
+            target.innerHTML = '';
+
+            const transaction = databaseInstance.transaction(['videos', 'users'], 'readonly');
+            const allUsersMap = {};
+            
+            transaction.objectStore('users').openCursor().onsuccess = (e) => {
+                const cursor = e.target.result;
+                if(cursor) {
+                    allUsersMap[cursor.value.id] = cursor.value;
+                    cursor.continue();
+                } else {
+                    transaction.objectStore('videos').getAll().onsuccess = (ev) => {
+                        const list = ev.target.result || [];
+                        list.forEach(item => {
+                            const container = document.createElement('div');
+                            container.className = 'short-container';
+
+                            const wrapper = document.createElement('div');
+                            wrapper.className = 'short-video-wrapper';
+
+                            const video = document.createElement('video');
+                            video.src = item.blobUrl || '';
+                            video.loop = true;
+                            video.controls = true; // Permet de reculer la vidéo librement via l'interface native discrète
+                            wrapper.appendChild(video);
+
+                            const observer = new IntersectionObserver((entries) => {
+                                entries.forEach(entry => {
+                                    if(entry.isIntersecting) {
+                                        document.querySelectorAll('video').forEach(v => { if(v !== video) v.pause(); });
+                                        video.play().catch(()=>{});
+                                    } else {
+                                        video.pause();
+                                    }
+                                });
+                            }, { threshold: 0.6 });
+                            observer.observe(container);
+
+                            const sidebar = document.createElement('div');
+                            sidebar.className = 'short-sidebar-actions';
+
+                            const creatorData = allUsersMap[item.ownerId] || { nickname: 'U', username: 'inconnu', followersList: [] };
+                            const avatarBtn = document.createElement('div');
+                            avatarBtn.className = 'action-icon-btn';
+                            avatarBtn.style.fontSize = '14px';
+                            avatarBtn.style.fontWeight = 'bold';
+                            avatarBtn.textContent = creatorData.nickname.charAt(0).toUpperCase();
+                            
+                            if(item.ownerId !== sessionActiveUser.id) {
+                                const isFollowing = sessionActiveUser.followingList && sessionActiveUser.followingList.includes(item.ownerId);
+                                const followBadge = document.createElement('div');
+                                followBadge.className = `follow-badge-btn ${isFollowing ? 'following-active' : ''}`;
+                                followBadge.innerHTML = isFollowing ? `<i class="fa-solid fa-check"></i>` : `<i class="fa-solid fa-plus"></i>`;
+                                followBadge.onclick = (e) => {
+                                    e.stopPropagation();
+                                    toggleFollowCreator(item.ownerId, followBadge);
+                                };
+                                avatarBtn.appendChild(followBadge);
+                            }
+                            sidebar.appendChild(avatarBtn);
+
+                            const isLiked = item.likedBy && item.likedBy.includes(sessionActiveUser.id);
+                            const likeBtn = document.createElement('div');
+                            likeBtn.className = `action-icon-btn ${isLiked ? 'liked-active' : ''}`;
+                            likeBtn.innerHTML = `<i class="fa-solid fa-heart"></i>`;
+                            likeBtn.onclick = () => toggleLikeStatus(item.id, likeBtn);
+                            sidebar.appendChild(likeBtn);
+
+                            const commBtn = document.createElement('div');
+                            commBtn.className = `action-icon-btn`;
+                            commBtn.innerHTML = `<i class="fa-solid fa-comment"></i>`;
+                            commBtn.onclick = () => toggleTikTokComments(item.id, container);
+                            sidebar.appendChild(commBtn);
+
+                            wrapper.appendChild(sidebar);
+
+                            const meta = document.createElement('div');
+                            meta.className = 'short-meta-bottom';
+                            meta.innerHTML = `<h3 style="margin-bottom:4px; font-weight:700; color:var(--velix-blue);">${item.mode === 'stream' ? '🔴 LIVE - ' : ''}${creatorData.nickname}</h3><p style="font-size:14px; color:#eee;">${item.title || ''}</p>`;
+                            wrapper.appendChild(meta);
+
+                            // Section Commentaires Glassmorphism TikTok
+                            const overlay = document.createElement('div');
+                            overlay.className = 'comments-overlay glass-panel';
+                            overlay.innerHTML = `
+                                <div class="comments-header"><span>Commentaires</span><span style="cursor:pointer; font-size:20px;" onclick="this.parentElement.parentElement.style.display='none'">&times;</span></div>
+                                <div class="comments-list-container" id="coms-list-${item.id}"></div>
+                                <div class="comment-input-row">
+                                    <input type="text" id="com-input-${item.id}" class="chat-search-input" placeholder="Laisser un commentaire..." style="margin:0;">
+                                    <button class="btn-primary" style="width:auto; padding:0 20px;" onclick="postTikTokComment(${item.id})"><i class="fa-solid fa-paper-plane"></i></button>
+                                </div>
+                            `;
+                            wrapper.appendChild(overlay);
+
+                            container.appendChild(wrapper);
+                            target.appendChild(container);
+                        });
+                    };
+                }
+            };
+        }
+
+        function toggleFollowCreator(creatorId, element) {
+            const tx = databaseInstance.transaction(['users'], 'readwrite');
+            const store = tx.objectStore('users');
+            
+            store.get(sessionActiveUser.id).onsuccess = (e) => {
+                const me = e.target.result;
+                if(!me.followingList) me.followingList = [];
+                
+                store.get(creatorId).onsuccess = (ev) => {
+                    const creator = ev.target.result;
+                    if(!creator.followersList) creator.followersList = [];
+
+                    if(me.followingList.includes(creatorId)) {
+                        me.followingList = me.followingList.filter(id => id !== creatorId);
+                        creator.followersList = creator.followersList.filter(id => id !== me.id);
+                        element.innerHTML = `<i class="fa-solid fa-plus"></i>`;
+                        element.classList.remove('following-active');
+                    } else {
+                        me.followingList.push(creatorId);
+                        creator.followersList.push(me.id);
+                        element.innerHTML = `<i class="fa-solid fa-check"></i>`;
+                        element.classList.add('following-active');
+                    }
+
+                    store.put(me);
+                    store.put(creator).onsuccess = () => {
+                        sessionActiveUser = me; 
+                    };
+                };
+            };
+        }
+
+        function toggleLikeStatus(videoId, element) {
+            const tx = databaseInstance.transaction(['videos'], 'readwrite');
+            const store = tx.objectStore('videos');
+            store.get(videoId).onsuccess = (e) => {
+                const data = e.target.result;
+                if(!data.likedBy) data.likedBy = [];
+                if(data.likedBy.includes(sessionActiveUser.id)) {
+                    data.likedBy = data.likedBy.filter(id => id !== sessionActiveUser.id);
+                    element.classList.remove('liked-active');
+                } else {
+                    data.likedBy.push(sessionActiveUser.id);
+                    element.classList.add('liked-active');
+                }
+                store.put(data);
+            };
+        }
+
+        function toggleTikTokComments(videoId, container) {
+            const overlay = container.querySelector('.comments-overlay');
+            if(overlay.style.display === 'flex') {
+                overlay.style.display = 'none';
+            } else {
+                overlay.style.display = 'flex';
+                loadTikTokComments(videoId);
+            }
+        }
+
+        function loadTikTokComments(videoId) {
+            const box = document.getElementById(`coms-list-${videoId}`);
+            box.innerHTML = '';
+            
+            const transaction = databaseInstance.transaction(['comments', 'users'], 'readonly');
+            const usersMap = {};
+            
+            transaction.objectStore('users').openCursor().onsuccess = (e) => {
+                const cursor = e.target.result;
+                if(cursor) { usersMap[cursor.value.id] = cursor.value; cursor.continue(); }
+                else {
+                    transaction.objectStore('comments').getAll().onsuccess = (ev) => {
+                        const list = ev.target.result || [];
+                        const filtered = list.filter(c => c.videoId === videoId);
+                        filtered.forEach(c => {
+                            const author = usersMap[c.authorId] || { nickname: 'Anonyme' };
+                            const item = document.createElement('div');
+                            item.className = 'comment-item';
+                            item.innerHTML = `
+                                <div class="comment-avatar">${author.nickname.charAt(0).toUpperCase()}</div>
+                                <div class="comment-content-box">
+                                    <div class="comment-author">${author.nickname}</div>
+                                    <div style="color:#eee;">${c.text}</div>
+                                </div>
+                            `;
+                            box.appendChild(item);
+                        });
+                        box.scrollTop = box.scrollHeight;
+                    };
+                }
+            };
+        }
+
+        function postTikTokComment(videoId) {
+            const input = document.getElementById(`com-input-${videoId}`);
+            const text = input.value.trim();
+            if(!text) return;
+
+            const tx = databaseInstance.transaction(['comments'], 'readwrite');
+            tx.objectStore('comments').add({
+                videoId: videoId,
+                authorId: sessionActiveUser.id,
+                text: text,
+                timestamp: Date.now()
+            }).onsuccess = () => {
+                input.value = '';
+                loadTikTokComments(videoId);
+            };
+        }
+
+        /* Caméra / Mode exclusif Vidéo et Partage d'écran communautaire */
+        function setStudioMode(mode) {
+            activeStudioMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active-mode'));
+            document.getElementById(`mode-${mode}`).classList.add('active-mode');
+
+            if(mode === 'stream') {
+                document.getElementById('studio-upload-fields').style.display = 'none';
+                document.getElementById('studio-live-fields').style.display = 'block';
+                document.getElementById('studio-action-row').style.display = 'none';
+                document.getElementById('studio-placeholder-text').textContent = "Prêt pour la diffusion de votre écran.";
+            } else {
+                document.getElementById('studio-upload-fields').style.display = 'block';
+                document.getElementById('studio-live-fields').style.display = 'none';
+                document.getElementById('studio-action-row').style.display = 'flex';
+                document.getElementById('studio-placeholder-text').textContent = "Sélectionnez une vidéo depuis vos fichiers.";
+            }
+        }
+
+        function triggerFilePicker() { if(activeStudioMode === 'video') document.getElementById('video-file-input').click(); }
+
+        function handleStudioFileSelection(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const previewBox = document.getElementById('camera-frame-box');
+            previewBox.innerHTML = ''; 
+            const localVideo = document.createElement('video');
+            localVideo.src = URL.createObjectURL(file);
+            localVideo.muted = true; localVideo.autoplay = true; localVideo.loop = true;
+            localVideo.style.width = '100%'; localVideo.style.height = '100%'; localVideo.style.objectFit = 'cover';
+            previewBox.appendChild(localVideo);
+        }
+
+        async function startScreenShareBroadcast() {
+            try {
+                liveStreamMediaObject = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+                const previewBox = document.getElementById('camera-frame-box');
+                previewBox.innerHTML = '';
+                
+                const liveVideo = document.createElement('video');
+                liveVideo.srcObject = liveStreamMediaObject;
+                liveVideo.muted = true; liveVideo.autoplay = true;
+                liveVideo.style.width = '100%'; liveVideo.style.height = '100%'; liveVideo.style.objectFit = 'cover';
+                previewBox.appendChild(liveVideo);
+
+                document.getElementById('live-indicator-label').style.display = 'block';
+                document.getElementById('btn-stop-live').style.display = 'block';
+                
+                alert("Votre écran est actuellement partagé en LIVE à la communauté Velix !");
+            } catch (err) {
+                alert("Impossible d'activer le partage d'écran : " + err.message);
+            }
+        }
+
+        function stopScreenShareBroadcast() {
+            if(liveStreamMediaObject) {
+                liveStreamMediaObject.getTracks().forEach(track => track.stop());
+            }
+            document.getElementById('live-indicator-label').style.display = 'none';
+            document.getElementById('btn-stop-live').style.display = 'none';
+            setStudioMode('video');
+            alert("LIVE arrêté.");
+        }
+
+        function publishMediaContent() {
+            const title = document.getElementById('video-title-input').value.trim();
+            const fileInput = document.getElementById('video-file-input');
+
+            if(!title || !fileInput.files[0]) return alert("Veuillez configurer un titre et choisir un fichier vidéo.");
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const tx = databaseInstance.transaction(['videos'], 'readwrite');
+                tx.objectStore('videos').add({
+                    ownerId: sessionActiveUser.id,
+                    title: title,
+                    blobUrl: e.target.result,
+                    mode: 'video',
+                    likedBy: [],
+                    timestamp: Date.now()
+                }).onsuccess = () => {
+                    alert("Vidéo publiée avec succès !");
+                    navigateTo('home');
+                };
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        /* Messagerie Instantanée & Effacement Immédiat des Notifications */
+        function refreshChatSystem() {
+            const query = document.getElementById('chat-search-input').value.trim().toLowerCase();
+            const usersTarget = document.getElementById('chat-users-list-target');
+            usersTarget.innerHTML = '';
+
+            const tx = databaseInstance.transaction(['users', 'messages'], 'readonly');
+            const unreadCountMap = {};
+
+            tx.objectStore('messages').getAll().onsuccess = (ev) => {
+                const msgs = ev.target.result || [];
+                msgs.forEach(m => {
+                    if(m.receiverId === sessionActiveUser.id && !m.read) {
+                        unreadCountMap[m.senderId] = (unreadCountMap[m.senderId] || 0) + 1;
+                    }
+                });
+
+                tx.objectStore('users').openCursor().onsuccess = (e) => {
+                    const cursor = e.target.result;
+                    if(cursor) {
+                        const user = cursor.value;
+                        if(user.id !== sessionActiveUser.id) {
+                            if(!query || user.nickname.toLowerCase().includes(query)) {
+                                const row = document.createElement('div');
+                                row.className = `chat-peer-item ${selectedChatPeerId === user.id ? 'active-peer' : ''}`;
+                                
+                                const unreadBadge = unreadCountMap[user.id] ? `<span style="background:var(--velix-blue); padding:2px 7px; border-radius:10px; font-size:11px; color:black; font-weight:700;">${unreadCountMap[user.id]}</span>` : '';
+                                row.innerHTML = `<span>${user.nickname}</span> ${unreadBadge}`;
+                                
+                                row.onclick = () => {
+                                    selectedChatPeerId = user.id;
+                                    markMessagesAsRead(user.id); // Retire la notification immédiatement lors du clic
+                                };
+                                usersTarget.appendChild(row);
+                            }
+                        }
+                        cursor.continue();
+                    } else {
+                        streamConversationBubbles();
+                    }
+                };
+            };
+        }
+
+        function markMessagesAsRead(senderId) {
+            const tx = databaseInstance.transaction(['messages'], 'readwrite');
+            const store = tx.objectStore('messages');
+            store.openCursor().onsuccess = (e) => {
+                const cursor = e.target.result;
+                if(cursor) {
+                    const m = cursor.value;
+                    if(m.senderId === senderId && m.receiverId === sessionActiveUser.id && !m.read) {
+                        m.read = true;
+                        cursor.update(m);
+                    }
+                    cursor.continue();
+                } else {
+                    checkUnreadNotifications();
+                    refreshChatSystem();
+                }
+            };
+        }
+
+        function streamConversationBubbles() {
+            const box = document.getElementById('chat-messages-box-target');
+            const actions = document.getElementById('chat-header-actions');
+            const title = document.getElementById('chat-current-peer-name');
+            box.innerHTML = '';
+
+            if(!selectedChatPeerId) { actions.style.display = 'none'; return; }
+            actions.style.display = 'flex';
+
+            databaseInstance.transaction(['users'], 'readonly').objectStore('users').get(selectedChatPeerId).onsuccess = (e) => {
+                if(e.target.result) title.textContent = e.target.result.nickname;
+            };
+
+            const tx = databaseInstance.transaction(['messages'], 'readonly');
+            tx.objectStore('messages').getAll().onsuccess = (e) => {
+                const list = e.target.result || [];
+                list.forEach(m => {
+                    if((m.senderId === sessionActiveUser.id && m.receiverId === selectedChatPeerId) ||
+                       (m.senderId === selectedChatPeerId && m.receiverId === sessionActiveUser.id)) {
+                        const bubble = document.createElement('div');
+                        bubble.className = `msg-bubble ${m.senderId === sessionActiveUser.id ? 'me' : 'other'}`;
+                        bubble.textContent = m.text;
+                        box.appendChild(bubble);
+                    }
+                });
+                box.scrollTop = box.scrollHeight;
+            };
+        }
+
+        function handleChatKeyDown(event) { if(event.key === 'Enter') dispatchPrivateMessage(); }
+
+        function dispatchPrivateMessage() {
+            const input = document.getElementById('chat-message-payload');
+            const txt = input.value.trim();
+            if(!txt || !selectedChatPeerId) return;
+
+            const tx = databaseInstance.transaction(['messages'], 'readwrite');
+            tx.objectStore('messages').add({
+                senderId: sessionActiveUser.id,
+                receiverId: selectedChatPeerId,
+                text: txt,
+                timestamp: Date.now(),
+                read: false
+            }).onsuccess = () => {
+                input.value = '';
+                streamConversationBubbles();
+            };
+        }
+
+        function checkUnreadNotifications() {
+            if(!sessionActiveUser) return;
+            const tx = databaseInstance.transaction(['messages'], 'readonly');
+            tx.objectStore('messages').getAll().onsuccess = (e) => {
+                const list = e.target.result || [];
+                const unread = list.filter(m => m.receiverId === sessionActiveUser.id && !m.read).length;
+                const badge = document.getElementById('global-badge');
+                if(unread > 0) { badge.textContent = unread; badge.style.display = 'block'; }
+                else { badge.style.display = 'none'; }
+            };
+        }
+
+        /* Profil : Lecture et suppression définitive de vos Shorts */
+        function displayPersonalProfile() {
+            if(!sessionActiveUser) return;
+            
+            databaseInstance.transaction(['users'], 'readonly').objectStore('users').get(sessionActiveUser.id).onsuccess = (e) => {
+                const userObj = e.target.result;
+                if(userObj) sessionActiveUser = userObj;
+
+                document.getElementById('profile-display-username').textContent = `@${sessionActiveUser.username}`;
+                document.getElementById('profile-display-fullname').textContent = sessionActiveUser.nickname;
+                document.getElementById('profile-followers-count').textContent = sessionActiveUser.followersList ? sessionActiveUser.followersList.length : 0;
+                document.getElementById('profile-following-count').textContent = sessionActiveUser.followingList ? sessionActiveUser.followingList.length : 0;
+                
+                const gridTarget = document.getElementById('profile-videos-grid-target');
+                gridTarget.innerHTML = '';
+
+                const tx = databaseInstance.transaction(['videos'], 'readonly');
+                tx.objectStore('videos').getAll().onsuccess = (event) => {
+                    const list = event.target.result || [];
+                    const myVideos = list.filter(v => v.ownerId === sessionActiveUser.id);
+
+                    myVideos.forEach(v => {
+                        const card = document.createElement('div');
+                        card.className = 'grid-video-card';
+                        
+                        const vid = document.createElement('video');
+                        vid.src = v.blobUrl;
+                        card.appendChild(vid);
+
+                        card.onclick = () => openPersonalVideoModal(v);
+                        gridTarget.appendChild(card);
+                    });
+                };
+            };
+        }
+
+        function openPersonalVideoModal(videoItem) {
+            const modal = document.getElementById('personal-video-modal');
+            const player = document.getElementById('modal-video-player');
+            const delBtn = document.getElementById('btn-delete-current-video');
+
+            player.src = videoItem.blobUrl;
+            modal.style.display = 'flex';
+
+            delBtn.onclick = () => {
+                if(confirm("Voulez-vous supprimer définitivement cette vidéo de votre compte ?")) {
+                    const tx = databaseInstance.transaction(['videos'], 'readwrite');
+                    tx.objectStore('videos').delete(videoItem.id).onsuccess = () => {
+                        closePersonalVideoModal();
+                        displayPersonalProfile();
+                    };
+                }
+            };
+        }
+
+        function closePersonalVideoModal() {
+            const modal = document.getElementById('personal-video-modal');
+            document.getElementById('modal-video-player').pause();
+            modal.style.display = 'none';
+        }
+
+        function openSettingsDrawer() { 
+            document.getElementById('edit-profile-nickname').value = sessionActiveUser.nickname;
+            document.getElementById('app-settings-drawer').classList.add('drawer-open'); 
+        }
+        function closeSettingsDrawer() { document.getElementById('app-settings-drawer').classList.remove('drawer-open'); }
+
+        function updateUserProfileData() {
+            const nick = document.getElementById('edit-profile-nickname').value.trim();
+            if(!nick) return alert("Le pseudo ne peut pas être vide.");
+            sessionActiveUser.nickname = nick;
+            const tx = databaseInstance.transaction(['users'], 'readwrite');
+            tx.objectStore('users').put(sessionActiveUser).onsuccess = () => {
+                closeSettingsDrawer();
+                displayPersonalProfile();
+            };
+        }
+
+        function triggerMapDeployment() {
+            setTimeout(() => {
+                if(!mapInstance) {
+                    mapInstance = L.map('map-container').setView([46.2276, 2.2137], 5);
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(mapInstance);
+                } else { mapInstance.invalidateSize(); }
+            }, 250);
+        }
+
+        function refreshAdminPanel() {
+            const tbody = document.getElementById('admin-users-tbody');
+            tbody.innerHTML = '';
+            databaseInstance.transaction(['users'], 'readonly').objectStore('users').openCursor().onsuccess = (e) => {
+                const cursor = e.target.result;
+                if(cursor) {
+                    const u = cursor.value;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${u.id}</td><td>@${u.username}</td><td>${u.nickname}</td><td>${u.isAdmin ? 'Administrateur' : 'Membre'}</td>`;
+                    tbody.appendChild(row);
+                    cursor.continue();
+                }
+            };
+        }
+    </script>
+</body>
+</html>
