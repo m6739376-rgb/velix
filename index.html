@@ -3,1634 +3,1011 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velix Shorts - Premium Glassmorphism V6</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+    <title>UNGRIFF — Achetez, Vendez, Dominez.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-base: #0A0A0A;         /* Noir profond */
-            --bg-glass: rgba(20, 20, 20, 0.6); /* Base Glassmorphism */
-            --border-glass: rgba(255, 255, 255, 0.08);
-            --velix-blue: #00AFFF;      /* Bleu électrique */
-            --velix-blue-glow: rgba(0, 175, 255, 0.3);
-            --text-main: #FFFFFF;
-            --text-muted: #A0A0A0;   
-            --radius-main: 14px;
-            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-main: #0a0a0c;
+            --bg-card: #141417;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a9;
+            --border: #27272a;
+            
+            /* Couleurs du thème UNGRIFF */
+            --primary: #ff3b30;
+            --primary-hover: #e02e24;
+            --primary-glow: rgba(255, 59, 48, 0.4);
+            --secondary: #27272a;
+            --success: #10b981;
+            --danger: #ef4444;
+            
+            /* Badges Rôles */
+            --badge-fonda: #311010;
+            --badge-fonda-txt: #ff6b6b;
+            --badge-admin: #1e293b;
+            --badge-admin-txt: #38bdf8;
+            
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            --radius-sm: 4px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --transition: all 0.25s ease-in-out;
         }
 
-        * { 
-            box-sizing: border-box; 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-            margin: 0; 
-            padding: 0;
-        }
-
-        body, html { 
-            width: 100%; 
-            height: 100%; 
-            background-color: var(--bg-base); 
-            color: var(--text-main); 
-            overflow: hidden; 
-        }
-
-        /* --- EFFETS GLOBAUX & ANIMATIONS --- */
-        .glass-panel {
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
-            border-radius: var(--radius-main);
-        }
-
-        /* --- COMPOSANT AUTHENTIFICATION --- */
-        .auth-container { 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100vw; height: 100vh; 
-            display: flex; justify-content: center; align-items: center; 
-            background: radial-gradient(circle at center, #111 0%, var(--bg-base) 100%); 
-            z-index: 9999; 
-        }
-        .auth-box { 
-            padding: 40px; 
-            width: 100%; 
-            max-width: 420px; 
-            text-align: center;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-        .brand-title { 
-            font-size: 36px; 
-            font-weight: 900; 
-            color: var(--velix-blue);
-            text-shadow: 0 0 15px var(--velix-blue-glow);
-            margin-bottom: 30px; 
-            letter-spacing: 1px;
-        }
-        .auth-box input, .chat-search-input, .form-container input { 
-            width: 100%; 
-            padding: 14px; 
-            margin-bottom: 15px; 
-            background: rgba(255, 255, 255, 0.04); 
-            border: 1px solid var(--border-glass); 
-            border-radius: var(--radius-main); 
-            color: var(--text-main); 
-            font-size: 15px; 
-            transition: var(--transition-smooth);
-        }
-        .auth-box input:focus, .chat-search-input:focus {
-            outline: none;
-            border-color: var(--velix-blue);
-            box-shadow: 0 0 10px var(--velix-blue-glow);
-        }
-        .auth-box p { 
-            font-size: 13px; 
-            color: var(--text-muted); 
-            cursor: pointer; 
-            margin-top: 15px; 
-            text-decoration: underline; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
         
-        /* --- STYLES DES BOUTONS ARRONDIS --- */
-        .btn-primary { 
-            width: 100%; 
-            padding: 14px; 
-            background: var(--velix-blue); 
-            color: black; 
-            border: none; 
-            border-radius: var(--radius-main); 
-            font-weight: 700; 
-            cursor: pointer; 
-            font-size: 16px; 
-            transition: var(--transition-smooth); 
-        }
-        .btn-primary:hover { 
-            opacity: 0.9; 
-            box-shadow: 0 0 15px var(--velix-blue-glow);
-        }
-        .btn-danger { 
-            background: #FF3B30; 
-            color: white; 
-            border: none; 
-            padding: 8px 16px; 
-            border-radius: var(--radius-main); 
-            cursor: pointer; 
-            font-weight: 600; 
-        }
-        .btn-secondary { 
-            background: rgba(255, 255, 255, 0.06); 
-            color: white; 
-            border: 1px solid var(--border-glass); 
-            padding: 8px 16px; 
-            border-radius: var(--radius-main); 
-            cursor: pointer; 
-            transition: var(--transition-smooth);
-        }
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* --- LAYOUT PLEIN ÉCRAN --- */
-        .main-wrapper { 
-            display: flex; 
-            width: 100vw; 
-            height: 100vh; 
-        }
-        .sidebar { 
-            width: 280px; 
-            background: rgba(10, 10, 10, 0.85);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid var(--border-glass); 
-            display: flex; 
-            flex-direction: column; 
-            padding: 30px 20px; 
-            z-index: 10; 
-        }
-        .sidebar .logo { 
-            font-size: 28px; 
-            font-weight: 900; 
-            color: var(--velix-blue);
-            text-shadow: 0 0 10px var(--velix-blue-glow);
-            margin-bottom: 40px; 
-            padding-left: 10px;
-        }
-        .nav-section { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-        }
-        .nav-item { 
-            padding: 14px 18px; 
-            color: var(--text-muted); 
-            font-weight: 600; 
-            cursor: pointer; 
-            border-radius: var(--radius-main); 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            position: relative; 
-            font-size: 16px; 
-            transition: var(--transition-smooth);
-        }
-        .nav-item i { 
-            color: var(--text-muted); 
-            font-size: 18px;
-            transition: var(--transition-smooth);
-        }
-        .nav-item:hover {
-            color: var(--text-main);
-            background: rgba(255, 255, 255, 0.03);
-        }
-        .nav-item.active { 
-            color: var(--text-main); 
-            background: rgba(0, 175, 255, 0.1); 
-            border-left: 4px solid var(--velix-blue); 
-        }
-        .nav-item.active i { 
-            color: var(--velix-blue); 
-        }
+        .container { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+        .hidden { display: none !important; }
         
-        .notif-badge { 
-            position: absolute; 
-            right: 15px; top: 50%; 
-            transform: translateY(-50%); 
-            background: var(--velix-blue); 
-            color: black; 
-            font-size: 11px; 
-            padding: 2px 7px; 
-            border-radius: 20px; 
-            font-weight: 700; 
-            display: none; 
-        }
-
-        .user-tag { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding-top: 20px; 
-            border-top: 1px solid var(--border-glass); 
-            font-weight: bold; 
-            position: relative; 
-        }
-        .dropdown-menu { 
-            display: none; 
-            position: absolute; 
-            bottom: 65px; right: 0; 
-            width: 200px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7); 
-            z-index: 100; 
-            padding: 6px;
-        }
-        .dropdown-item { 
-            padding: 12px; 
-            font-size: 14px; 
-            cursor: pointer; 
-            color: var(--text-main); 
-            border-radius: 8px;
-            transition: var(--transition-smooth);
-        }
-        .dropdown-item:hover { 
-            background: rgba(255,255,255,0.08); 
-            color: var(--velix-blue);
-        }
-
-        .content-viewport { 
-            flex: 1; 
-            height: 100%; 
-            position: relative; 
-            background: var(--bg-base); 
-        }
-        .screen-view { 
-            width: 100%; 
-            height: 100%; 
-            display: none; 
-            overflow-y: auto; 
-        }
-        .screen-view.active-view { 
-            display: block; 
-        }
-
-        /* --- FLUX STYLE TIKTOK COMPLET --- */
-        #view-home { 
-            overflow-y: scroll; 
-            scroll-snap-type: y mandatory; 
-            height: 100vh; 
-            background: #000; 
-        }
-        .short-container { 
-            position: relative; 
-            width: 100%; 
-            height: 100vh; 
-            scroll-snap-align: start; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-        }
-        .short-video-wrapper { 
-            position: relative; 
-            width: 100%; 
-            max-width: 480px; 
-            height: 100%; 
-            background: #000; 
-            display: flex; 
-            align-items: center; 
-        }
-        .short-video-wrapper video { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-        }
+        /* Badges */
+        .badge { padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-fonda { background: var(--badge-fonda); color: var(--badge-fonda-txt); border: 1px solid var(--primary); }
+        .badge-admin { background: var(--badge-admin); color: var(--badge-admin-txt); }
         
-        .short-sidebar-actions { 
-            position: absolute; 
-            right: 15px; 
-            bottom: 100px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-            align-items: center; 
-            z-index: 5; 
-        }
-        .action-icon-btn { 
-            position: relative; 
-            background: rgba(20, 20, 20, 0.6); 
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-glass); 
-            width: 52px; height: 52px; 
-            border-radius: 50%; 
-            display: flex; 
-            justify-content: center; align-items: center; 
-            color: white; 
-            font-size: 20px; 
-            cursor: pointer; 
-            transition: var(--transition-smooth);
-        }
-        .action-icon-btn:hover {
-            transform: scale(1.08);
-        }
-        .action-icon-btn.liked-active { 
-            color: var(--velix-blue); 
-            text-shadow: 0 0 12px var(--velix-blue); 
-        }
+        /* Formulaires */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-main); }
+        .form-control { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background: var(--bg-card); color: var(--text-main); transition: var(--transition); }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-glow); }
         
-        /* Bouton Suivre Style TikTok */
-        .follow-badge-btn { 
-            position: absolute; 
-            bottom: -5px; 
-            background: var(--velix-blue); 
-            width: 22px; height: 22px; 
-            border-radius: 50%; 
-            display: flex; 
-            justify-content: center; align-items: center; 
-            font-size: 11px; 
-            color: black; 
-            border: 2px solid #000; 
-            transition: var(--transition-smooth);
-        }
-        .follow-badge-btn.following-active { 
-            background: #34C759; 
-            color: white;
-        }
+        /* Boutons */
+        .btn { padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); justify-content: center; text-transform: uppercase; letter-spacing: 0.5px; border: none; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 0 15px var(--primary-glow); }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-secondary { background: var(--secondary); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: #3f3f46; }
+        .btn-danger { background: var(--danger); color: white; }
 
-        .short-meta-bottom { 
-            position: absolute; 
-            left: 20px; 
-            bottom: 30px; 
-            right: 90px; 
-            z-index: 5; 
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9); 
-        }
+        /* Header Marketplace */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 500; }
+        .top-nav { background: #000; font-size: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .top-nav .container { display: flex; justify-content: space-between; align-items: center; }
+
+        .main-header { padding: 20px 0; }
+        .main-header .container { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
         
-        /* Zone Commentaires TikTok Réaliste */
-        .comments-overlay { 
-            position: absolute; 
-            bottom: 0; left: 0; right: 0; 
-            height: 65%; 
-            display: none; 
-            flex-direction: column; 
-            padding: 25px; 
-            z-index: 10; 
-            border-top-left-radius: 20px; 
-            border-top-right-radius: 20px; 
-        }
-        .comments-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 20px; 
-            font-weight: 700; 
-            font-size: 16px;
-        }
-        .comments-list-container { 
-            flex: 1; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 16px; 
-            margin-bottom: 15px; 
-        }
-        .comment-item { 
-            display: flex; 
-            gap: 12px; 
-            font-size: 14px; 
-        }
-        .comment-avatar { 
-            width: 36px; height: 36px; 
-            border-radius: 50%; 
-            background: rgba(255,255,255,0.1); 
-            display: flex; 
-            justify-content: center; align-items: center; 
-            font-weight: 700; 
-            font-size: 13px; 
-        }
-        .comment-content-box { 
-            flex: 1; 
-        }
-        .comment-author { 
-            font-weight: 600; 
-            margin-bottom: 3px; 
-            color: var(--text-muted); 
-        }
-        .comment-input-row { 
-            display: flex; 
-            gap: 12px; 
-            border-top: 1px solid var(--border-glass); 
-            padding-top: 15px; 
-        }
-
-        /* --- STUDIO DE CRÉATION (VIDÉO EXCLUSIVE) --- */
-        .form-container { 
-            max-width: 750px; 
-            padding: 35px; 
-            margin: 40px auto; 
-        }
-        .studio-layout { 
-            display: flex; 
-            gap: 25px; 
-            margin-top: 25px; 
-        }
-        .camera-box { 
-            width: 240px; height: 340px; 
-            background: #000; 
-            border-radius: var(--radius-main); 
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; align-items: center; 
-            border: 1px solid var(--border-glass); 
-            overflow: hidden; 
-        }
-        .studio-fields { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
-        .camera-modes { 
-            display: flex; 
-            justify-content: center; 
-            gap: 12px; 
-            margin-bottom: 15px; 
-        }
-        .mode-btn { 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid var(--border-glass); 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 30px; 
-            cursor: pointer; 
-            font-size: 14px; 
-            font-weight: 600;
-            transition: var(--transition-smooth);
-        }
-        .mode-btn.active-mode { 
-            background: var(--velix-blue); 
-            color: black;
-            border: none; 
-            box-shadow: 0 0 10px var(--velix-blue-glow);
-        }
-        .live-indicator { 
-            position: absolute; 
-            top: 15px; left: 15px; 
-            background: #FF3B30; 
-            padding: 4px 10px; 
-            border-radius: 6px; 
-            font-size: 11px; 
-            font-weight: 700; 
-            display: none; 
-            animation: blink 1.5s infinite; 
-        }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-        /* --- SYSTÈME DE MESSAGERIE --- */
-        .chat-layout { 
-            display: flex; 
-            margin: 20px; 
-            height: calc(100vh - 40px); 
-            overflow: hidden; 
-        }
-        .chat-sidebar { 
-            width: 300px; 
-            border-right: 1px solid var(--border-glass); 
-            padding: 25px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
-        .chat-users-list { 
-            flex: 1; 
-            overflow-y: auto; 
-        }
-        .chat-peer-item { 
-            padding: 14px 18px; 
-            border-radius: var(--radius-main); 
-            cursor: pointer; 
-            margin-bottom: 8px; 
-            color: var(--text-muted); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            transition: var(--transition-smooth);
-        }
-        .chat-peer-item:hover {
-            background: rgba(255, 255, 255, 0.02);
-            color: var(--text-main);
-        }
-        .chat-peer-item.active-peer { 
-            background: rgba(0, 175, 255, 0.08); 
-            color: var(--text-main); 
-            border-left: 4px solid var(--velix-blue); 
-        }
-        .chat-main { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            background: rgba(5, 5, 5, 0.4); 
-        }
-        .chat-header { 
-            padding: 20px 25px; 
-            border-bottom: 1px solid var(--border-glass); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .chat-messages { 
-            flex: 1; 
-            padding: 25px; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 14px; 
-        }
-        .msg-bubble { 
-            max-width: 65%; 
-            padding: 12px 18px; 
-            border-radius: 18px; 
-            white-space: pre-line; 
-            font-size: 15px;
-        }
-        .msg-bubble.me { 
-            background: var(--velix-blue); 
-            color: black;
-            font-weight: 500;
-            align-self: flex-end; 
-            border-bottom-right-radius: 4px;
-        }
-        .msg-bubble.other { 
-            background: rgba(255, 255, 255, 0.06); 
-            color: var(--text-main);
-            align-self: flex-start; 
-            border-bottom-left-radius: 4px;
-            border: 1px solid var(--border-glass);
-        }
-        .chat-input-row { 
-            padding: 25px; 
-            display: flex; 
-            gap: 15px; 
-        }
-
-        /* --- PROFIL REPRENANT LES COMPTEURS --- */
-        .profile-card-container { 
-            max-width: 850px; 
-            margin: 0 auto; 
-            padding: 40px 20px; 
-        }
-        .profile-header-tiktok { 
-            display: flex; 
-            align-items: center; 
-            gap: 35px; 
-            margin-bottom: 35px; 
-        }
-        .profile-avatar-img { 
-            width: 115px; height: 115px; 
-            border-radius: 50%; 
-            background: rgba(255,255,255,0.05); 
-            border: 2px solid var(--border-glass); 
-            display: flex; justify-content: center; align-items: center; 
-            font-size: 38px; font-weight: 700; 
-            cursor: pointer; 
-        }
-        .profile-info-tiktok { 
-            flex: 1; 
-        }
+        .logo { font-size: 26px; font-weight: 900; color: #fff; text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary); cursor: pointer; letter-spacing: 1.5px; }
         
-        .profile-stats-tiktok { 
-            display: flex; 
-            gap: 30px; 
-            margin-bottom: 25px; 
-            border-bottom: 1px solid var(--border-glass); 
-            padding-bottom: 20px; 
-        }
-        .stat-item-tk { 
-            font-size: 15px; 
-            color: var(--text-muted); 
-        }
-        .stat-item-tk strong { 
-            color: white; 
-            font-size: 20px; 
-            margin-right: 5px; 
-        }
+        .search-container { flex: 1; max-width: 600px; display: flex; }
+        .search-container input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm) 0 0 var(--radius-sm); font-size: 14px; background: var(--bg-main); color: var(--text-main); }
+        .search-btn { background: var(--primary); color: white; padding: 0 24px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; cursor: pointer; border: none; }
+        
+        .header-actions { display: flex; align-items: center; gap: 24px; }
+        .action-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--text-muted); cursor: pointer; position: relative; font-weight: 500; }
+        .action-item:hover { color: var(--text-main); }
+        .action-item i { margin-bottom: 4px; color: var(--text-main); }
+        .counter-badge { position: absolute; top: -6px; right: 2px; background: var(--primary); color: white; font-size: 10px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
-        .videos-grid-tk { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 8px; 
-        }
-        .grid-video-card { 
-            aspect-ratio: 3/4; 
-            background: #000; 
-            border-radius: 8px;
-            border: 1px solid var(--border-glass); 
-            position: relative; 
-            overflow: hidden; 
-            cursor: pointer; 
-            transition: var(--transition-smooth);
-        }
-        .grid-video-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--velix-blue);
-        }
-        .grid-video-card video { 
-            width: 100%; height: 100%; 
-            object-fit: cover; 
-            pointer-events: none; 
-        }
+        .categories-nav { background: #0f0f11; border-bottom: 1px solid var(--border); padding: 12px 0; }
+        .categories-nav ul { display: flex; gap: 24px; list-style: none; font-size: 13px; font-weight: 600; overflow-x: auto; }
+        .categories-nav li { cursor: pointer; color: var(--text-muted); transition: var(--transition); white-space: nowrap; }
+        .categories-nav li:hover, .categories-nav li.active { color: var(--primary); }
 
-        /* --- FENÊTRES MODALES ET DRAWERS --- */
-        .video-modal-view { 
-            display: none; 
-            position: fixed; 
-            top:0; left:0; 
-            width:100vw; height:100vh; 
-            background: rgba(0,0,0,0.95); 
-            z-index: 20000; 
-            justify-content: center; align-items: center; 
-        }
-        .video-modal-content { 
-            width: 100%; 
-            max-width: 440px; 
-            height: 85vh; 
-            background: #000; 
-            display: flex; 
-            flex-direction: column; 
-            border-radius: var(--radius-main); 
-            overflow: hidden; 
-            border: 1px solid var(--border-glass); 
-        }
-        .video-modal-content video { 
-            flex: 1; 
-            width: 100%; 
-            object-fit: cover; 
-        }
-        .video-modal-toolbar { 
-            padding: 20px; 
-            background: #0A0A0A; 
-            display: flex; 
-            justify-content: space-between; align-items: center; 
-        }
+        .page-content { flex: 1; padding: 40px 0; }
+        
+        .hero-banner { background: linear-gradient(90deg, #141417 0%, #270c0c 100%); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 60px; margin-bottom: 40px; position: relative; overflow: hidden; box-shadow: var(--shadow); }
+        .hero-text h1 { font-size: 42px; font-weight: 800; text-transform: uppercase; line-height: 1.1; margin-bottom: 12px; }
+        .hero-text h1 span { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
+        .hero-text p { color: var(--text-muted); font-size: 15px; margin-bottom: 24px; max-width: 500px; }
 
-        .settings-drawer { 
-            position: fixed; 
-            top: 0; right: -420px; 
-            width: 420px; height: 100vh; 
-            z-index: 10005; 
-            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            padding: 35px; 
-            overflow-y: auto; 
-            box-shadow: -10px 0 30px rgba(0,0,0,0.5); 
-        }
-        .settings-drawer.drawer-open { 
-            right: 0; 
-        }
-        .drawer-header { 
-            display: flex; 
-            justify-content: space-between; align-items: center; 
-            margin-bottom: 35px; 
-            border-bottom: 1px solid var(--border-glass); 
-            padding-bottom: 15px; 
-        }
+        .section-title { font-size: 20px; font-weight: 800; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.5px; border-left: 4px solid var(--primary); padding-left: 12px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .shop-controls { display: flex; gap: 16px; margin-bottom: 24px; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); }
 
-        .accounts-modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); 
-            z-index: 10000; 
-            justify-content: center; align-items: center; 
-        }
-        .accounts-box { 
-            padding: 35px; 
-            border-radius: var(--radius-main); 
-            width: 360px; 
-            text-align: center; 
-        }
+        /* Grille de Produits */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; position: relative; transition: var(--transition); display: flex; flex-direction: column; cursor: pointer; }
+        .product-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 5px 20px rgba(255, 59, 48, 0.15); }
+        .product-img-holder { height: 200px; background: #1c1c1f; display: flex; align-items: center; justify-content: center; position: relative; padding: 16px; }
+        .product-img-holder img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .fav-toggle-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: rgba(0,0,0,0.6); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: var(--transition); z-index: 10; }
+        .fav-toggle-btn.active { color: var(--primary); }
+        .product-details { padding: 16px; display: flex; flex-direction: column; flex: 1; }
+        .product-cat-tag { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; }
+        .product-title-text { font-size: 14px; font-weight: 600; margin-bottom: 8px; height: 40px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .product-price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; }
+        .price-current { font-size: 18px; font-weight: 800; color: #fff; }
+        
+        .buy-btn { width: 100%; margin-top: 12px; background: var(--secondary); color: var(--text-main); border: 1px solid var(--border); padding: 10px; font-weight: 700; font-size: 12px; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .buy-btn:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); }
+        .buy-btn:disabled { background: #1a1a1c; color: var(--danger); border-color: #2a1a1a; cursor: not-allowed; }
 
-        /* --- SECTION CARTE --- */
-        #view-map {
-            padding: 20px;
-        }
-        .map-layout-wrapper {
-            display: flex;
-            width: 100%;
-            height: calc(100vh - 40px);
-            gap: 20px;
-        }
-        .map-side-panel {
-            width: 320px;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .map-render-zone {
-            flex: 1;
-            border-radius: var(--radius-main);
-            border: 1px solid var(--border-glass);
-            overflow: hidden;
-        }
+        /* Structures layouts */
+        .split-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; align-items: start; }
+        .dashboard-box { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius-md); }
+        .cart-row { display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+        .cart-img { width: 60px; height: 60px; object-fit: contain; background: #1c1c1f; border-radius: var(--radius-sm); padding: 4px; }
+        
+        .floating-admin-btn { position: fixed; bottom: 32px; right: 32px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 20px var(--primary-glow); z-index: 999; transition: var(--transition); }
 
-        /* --- ADMIN PANEL --- */
-        .admin-dashboard { padding: 40px; max-width: 1100px; margin: 0 auto; }
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .admin-table th, .admin-table td { padding: 16px; border-bottom: 1px solid var(--border-glass); text-align: left; font-size: 14px; }
-        .admin-table th { background: rgba(255,255,255,0.03); color: var(--text-muted); }
+        /* Back-Office ERP */
+        #admin-panel-layout { display: flex; min-height: 100vh; background-color: #09090b; }
+        .admin-sidebar { width: 260px; background: var(--bg-card); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 600; }
+        .admin-sidebar-header { padding: 24px; font-size: 18px; font-weight: 800; border-bottom: 1px solid var(--border); letter-spacing: 1px; color: var(--primary); }
+        .admin-nav-list { list-style: none; padding: 20px 12px; flex: 1; }
+        .admin-nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-muted); border-radius: var(--radius-sm); margin-bottom: 4px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .admin-nav-item.active { background: var(--secondary); color: white; border-left: 3px solid var(--primary); color: var(--primary); }
+        .admin-viewport { flex: 1; margin-left: 260px; padding: 40px; }
+
+        .crm-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px; text-align: left; }
+        .crm-table th { background: var(--secondary); padding: 14px; font-weight: 700; border-bottom: 1px solid var(--border); }
+        .crm-table td { padding: 14px; border-bottom: 1px solid var(--border); }
+
+        /* Modals */
+        .modal-mask { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(4px); z-index:2000; display:flex; align-items:center; justify-content:center; }
+        .modal-window { background: var(--bg-card); border: 1px solid var(--border); width: 100%; max-width: 550px; border-radius: var(--radius-lg); overflow: hidden; }
+        .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+        .modal-content { padding: 20px; max-height: 70vh; overflow-y: auto; }
+        .modal-footer { padding: 16px; border-top: 1px solid var(--border); background: #0f0f11; display: flex; justify-content: flex-end; gap: 12px; }
+
+        /* Écran d'authentification */
+        .auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .auth-box { background: var(--bg-card); border: 1px solid var(--border); padding: 40px; border-radius: var(--radius-lg); width: 100%; max-width: 420px; text-align: center; box-shadow: var(--shadow); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border); padding: 40px 0; font-size: 13px; color: var(--text-muted); text-align: center; }
     </style>
 </head>
 <body>
 
-    <div id="auth-gateway" class="auth-container">
-        <div class="auth-box glass-panel">
-            <h1 class="brand-title"><i class="fa-solid fa-bolt"></i> VELIX</h1>
-            <div id="login-module">
-                <h2 style="margin-bottom:20px; font-weight:600;">Connexion</h2>
-                <input type="text" id="login-identity" placeholder="Identifiant ou E-mail">
-                <input type="password" id="login-password" placeholder="Mot de passe">
-                <button class="btn-primary" onclick="processLogin()">Se connecter</button>
-                <p onclick="switchAuthView(false)">Créer un nouveau compte</p>
+    <div id="ungriff-auth-screen" class="auth-screen hidden">
+        <div class="auth-box">
+            <div class="logo" style="margin-bottom: 24px; display: inline-block;">UNGRIFF</div>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">Entrez votre adresse mail pour vous connecter.</p>
+            <div class="form-group" style="text-align: left;">
+                <label>Adresse Mail</label>
+                <input type="email" id="auth-email-input" class="form-control" placeholder="exemple@mail.com" onchange="checkEmailField(this.value)">
             </div>
-            <div id="register-module" style="display:none;">
-                <h2 style="margin-bottom:20px; font-weight:600;">Inscription</h2>
-                <input type="text" id="reg-username" placeholder="Identifiant unique (@nom)">
-                <input type="text" id="reg-nickname" placeholder="Surnom (Pseudo obligatoire)">
-                <input type="email" id="reg-email" placeholder="Adresse e-mail">
-                <input type="password" id="reg-password" placeholder="Mot de passe">
-                <button class="btn-primary" onclick="processRegister()">S'inscrire</button>
-                <p onclick="switchAuthView(true)">Déjà membre ? Connexion</p>
+            <div class="form-group hidden" style="text-align: left;" id="auth-password-area">
+                <label>Mot de passe Staff</label>
+                <input type="password" id="auth-password-input" class="form-control" placeholder="••••••••">
             </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="handleAuthSubmit()">Entrer sur le site</button>
         </div>
     </div>
 
-    <div class="main-wrapper">
-        <aside class="sidebar">
-            <div class="logo"><i class="fa-solid fa-bolt"></i> VELIX</div>
-            <div class="nav-section">
-                <div class="nav-item active" id="nav-home" onclick="navigateTo('home')"><i class="fa-solid fa-house"></i> Pour toi</div>
-                <div class="nav-item" id="nav-upload" onclick="navigateTo('upload')"><i class="fa-solid fa-circle-plus"></i> Publier</div>
-                <div class="nav-item" id="nav-map" onclick="navigateTo('map')"><i class="fa-solid fa-location-dot"></i> Carte</div>
-                <div class="nav-item" id="nav-chat" onclick="navigateTo('chat')">
-                    <i class="fa-solid fa-message"></i> Messages
-                    <span id="global-badge" class="notif-badge">0</span>
+    <div id="ungriff-client-app">
+        <header>
+            <div class="top-nav">
+                <div class="container">
+                    <div>⚡ Slogan : <strong>UNGRIFF — Achetez, Vendez, Dominez.</strong></div>
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <span id="user-logged-display" style="font-weight: 600;"></span>
+                        <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="logOutUser()">Changer de compte</button>
+                    </div>
                 </div>
-                <div class="nav-item" id="nav-profile" onclick="navigateTo('profile')"><i class="fa-solid fa-user"></i> Profil</div>
-                <div class="nav-item" id="nav-admin" onclick="navigateTo('admin')" style="display:none;"><i class="fa-solid fa-shield-halved"></i> Admin</div>
             </div>
-            <div class="user-tag">
-                <span id="global-username-display" style="color:var(--velix-blue);">@invite</span>
-                <span style="cursor:pointer; padding:5px; font-size:18px;" onclick="toggleDropdownMenu()"><i class="fa-solid fa-ellipsis"></i></span>
-                <div class="dropdown-menu glass-panel" id="user-dropdown">
-                    <div class="dropdown-item" onclick="disconnectSession()"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</div>
-                    <div class="dropdown-item" onclick="openSwitchAccountModal()"><i class="fa-solid fa-user-gear"></i> Changer de compte</div>
+            <div class="main-header">
+                <div class="container">
+                    <div class="logo" onclick="changePage('home')">UNGRIFF</div>
+                    <div class="search-container">
+                        <input type="text" id="global-search-bar" placeholder="Rechercher un t-shirt, sweat, pantalon..." onkeyup="instantSearch(this.value)">
+                        <button class="search-btn"><i data-lucide="search"></i></button>
+                    </div>
+                    <div class="header-actions">
+                        <div class="action-item" onclick="changePage('profil')">
+                            <i data-lucide="user"></i>
+                            <span>Profil</span>
+                        </div>
+                        <div class="action-item" onclick="changePage('favoris')">
+                            <i data-lucide="heart"></i>
+                            <span>Favoris</span>
+                            <div class="counter-badge" id="fav-badge-count">0</div>
+                        </div>
+                        <div class="action-item" onclick="changePage('panier')">
+                            <i data-lucide="shopping-cart"></i>
+                            <span>Panier</span>
+                            <div class="counter-badge" id="cart-badge-count">0</div>
+                        </div>
+                        <div class="action-item hidden" id="panel-access-shortcut" onclick="openStaffPanel()" style="color:var(--primary);">
+                            <i data-lucide="shield"></i>
+                            <span>Panel Staff</span>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="categories-nav">
+                <div class="container">
+                    <ul id="categories-menu"></ul>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-content container" id="client-view-container"></main>
+
+        <footer>
+            <div class="container">
+                <p style="font-weight:700; color:white; margin-bottom:10px;">UNGRIFF MARKETPLACE &copy; 2026</p>
+                <p>Achetez, Vendez, Dominez.</p>
+            </div>
+        </footer>
+
+        <div id="quick-add-btn" class="floating-admin-btn hidden" onclick="openAddProductModal()">
+            <i data-lucide="plus"></i>
+        </div>
+    </div>
+
+    <div id="admin-panel-layout" class="hidden">
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header">UNGRIFF BACK OFFICE</div>
+            <ul class="admin-nav-list">
+                <li class="admin-nav-item active" id="menu-item-products" onclick="changeAdminSubPage('products')"><i data-lucide="package"></i>Gestion Produits</li>
+                <li class="admin-nav-item" id="menu-item-orders" onclick="changeAdminSubPage('orders')"><i data-lucide="shopping-bag"></i>Gestion Commandes</li>
+                <li class="admin-nav-item hidden" id="menu-item-staff" onclick="changeAdminSubPage('staff')"><i data-lucide="users"></i>Gestion Staff</li>
+            </ul>
+            <div style="padding:16px; border-top:1px solid var(--border);">
+                <button class="btn btn-secondary" style="width:100%;" onclick="closeStaffPanel()"><i data-lucide="log-out"></i> Quitter</button>
             </div>
         </aside>
-
-        <main class="content-viewport">
-            <section id="view-home" class="screen-view active-view"></section>
-
-            <section id="view-upload" class="screen-view">
-                <div class="form-container glass-panel">
-                    <h2 style="font-weight:700; margin-bottom:5px;">Studio de création</h2>
-                    <p style="color:var(--text-muted); font-size:14px; margin-bottom:25px;">Seul le format vidéo est autorisé sur Velix Shorts.</p>
-                    
-                    <div class="studio-layout">
-                        <div class="camera-box" id="camera-frame-box">
-                            <div class="live-indicator" id="live-indicator-label">LIVE</div>
-                            <i class="fa-solid fa-clapperboard fa-3x" style="color:rgba(255,255,255,0.1); margin-bottom:15px;"></i>
-                            <span style="font-size:13px; color:var(--text-muted); text-align:center; padding:0 15px;" id="studio-placeholder-text">Parcourez vos fichiers pour importer un Short</span>
-                            <div style="position:absolute; bottom:15px; background:var(--velix-blue); width:36px; height:36px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; color:black;" onclick="triggerFilePicker()">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                        </div>
-
-                        <div class="studio-fields">
-                            <div class="camera-modes">
-                                <button class="mode-btn active-mode" id="mode-video" onclick="setStudioMode('video')">Vidéo Short</button>
-                                <button class="mode-btn" id="mode-stream" onclick="setStudioMode('stream')">Partage d'écran LIVE</button>
-                            </div>
-
-                            <div id="studio-upload-fields">
-                                <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px; color:var(--text-muted);">Légende de votre Short</label>
-                                <input type="text" id="video-title-input" placeholder="Décrivez votre vidéo...">
-                                <input type="file" id="video-file-input" accept="video/*" style="display:none;" onchange="handleStudioFileSelection(event)">
-                            </div>
-
-                            <div id="studio-live-fields" style="display:none;">
-                                <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Diffusez l'intégralité de votre écran à la communauté en direct.</p>
-                                <button class="btn-primary" style="background:#FF3B30; color:white;" onclick="startScreenShareBroadcast()"><i class="fa-solid fa-desktop"></i> Lancer le partage d'écran</button>
-                                <button class="btn-secondary" style="width:100%; margin-top:10px; display:none;" id="btn-stop-live" onclick="stopScreenShareBroadcast()">Interrompre le LIVE</button>
-                            </div>
-
-                            <div style="display:flex; gap:12px; margin-top:15px;" id="studio-action-row">
-                                <button class="btn-secondary" style="flex:1;" onclick="navigateTo('home')">Annuler</button>
-                                <button class="btn-primary" style="flex:1;" onclick="publishMediaContent()">Mettre en ligne</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="view-map" class="screen-view">
-                <div class="map-layout-wrapper">
-                    <div class="map-side-panel glass-panel">
-                        <h3 style="font-weight:700;"><i class="fa-solid fa-earth-europe"></i> Explorer Velix</h3>
-                        <p style="font-size:13px; color:var(--text-muted);">Visualisez la position géographique des membres de la communauté en temps réel.</p>
-                        <hr style="border-color:var(--border-glass);">
-                        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; color:var(--text-muted); font-size:14px; text-align:center;">
-                            <i class="fa-solid fa-location-crosshairs fa-2x" style="margin-bottom:10px; color:var(--velix-blue);"></i>
-                            Géolocalisation activée
-                        </div>
-                    </div>
-                    <div class="map-render-zone" id="map-container"></div>
-                </div>
-            </section>
-
-            <section id="view-chat" class="screen-view">
-                <div class="chat-layout glass-panel">
-                    <div class="chat-sidebar">
-                        <h3 style="font-weight:700; margin-bottom:5px;">Discussions</h3>
-                        <input type="text" id="chat-search-input" class="chat-search-input" placeholder="Rechercher un membre..." oninput="refreshChatSystem()">
-                        <div class="chat-users-list" id="chat-users-list-target"></div>
-                    </div>
-                    <div class="chat-main">
-                        <div class="chat-header" id="chat-header-actions" style="display:none; background: rgba(255,255,255,0.01);">
-                            <span id="chat-current-peer-name" style="font-weight:700; font-size:16px;">Discussion</span>
-                        </div>
-                        <div class="chat-messages" id="chat-messages-box-target"></div>
-                        <div class="chat-input-row">
-                            <input type="text" id="chat-message-payload" class="chat-search-input" style="flex:1; margin:0;" placeholder="Écrire un message..." onkeydown="handleChatKeyDown(event)">
-                            <button class="btn-primary" style="width:auto; padding:0 25px;" onclick="dispatchPrivateMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="view-profile" class="screen-view">
-                <div class="profile-card-container">
-                    <div class="profile-header-tiktok">
-                        <div class="profile-avatar-img" id="profile-avatar-display">V</div>
-                        <div class="profile-info-tiktok">
-                            <h2 id="profile-display-username" style="font-size:26px; font-weight:800; margin-bottom:4px;">@username</h2>
-                            <h3 id="profile-display-fullname" style="font-size:16px; font-weight:500; color:var(--text-muted); margin-bottom:15px;">Mon Surnom</h3>
-                            <div>
-                                <button class="btn-secondary" onclick="openSettingsDrawer()"><i class="fa-solid fa-sliders" style="margin-right:8px;"></i>Réglages du profil</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="profile-stats-tiktok">
-                        <div class="stat-item-tk"><strong id="profile-followers-count">0</strong> abonnés</div>
-                        <div class="stat-item-tk"><strong id="profile-following-count">0</strong> abonnements</div>
-                    </div>
-
-                    <h3 style="font-weight:700; margin-bottom:15px; font-size:16px; letter-spacing:0.5px;">MES CRÉATIONS</h3>
-                    <div class="videos-grid-tk" id="profile-videos-grid-target"></div>
-                </div>
-            </section>
-
-            <section id="view-admin" class="screen-view">
-                <div class="admin-dashboard">
-                    <h1 style="color:var(--velix-blue); font-weight:900; margin-bottom:10px;"><i class="fa-solid fa-user-shield"></i> Panneau d'administration</h1>
-                    <div class="glass-panel" style="padding:25px; margin-top:20px;">
-                        <h2 style="font-size:18px; font-weight:700;">Contrôle de la communauté</h2>
-                        <table class="admin-table">
-                            <thead>
-                                <tr><th>ID</th><th>Identifiant</th><th>Surnom</th><th>Rôle</th></tr>
-                            </thead>
-                            <tbody id="admin-users-tbody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-        </main>
+        <main class="admin-viewport" id="admin-view-container"></main>
     </div>
 
-    <div class="video-modal-view" id="personal-video-modal">
-        <div class="video-modal-content">
-            <video id="modal-video-player" controls autoplay loop></video>
-            <div class="video-modal-toolbar">
-                <button class="btn-secondary" onclick="closePersonalVideoModal()">Fermer</button>
-                <button class="btn-danger" id="btn-delete-current-video"><i class="fa-solid fa-trash-can"></i> Supprimer</button>
+    <div id="product-modal" class="modal-mask hidden">
+        <div class="modal-window">
+            <div class="modal-header">
+                <span id="modal-title-action">Ajouter un produit</span>
+                <button onclick="closeProductModal()" style="background:none; border:none; color:white; cursor:pointer;"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-content">
+                <div class="form-group"><label>Nom du produit</label><input type="text" id="form-p-name" class="form-control"></div>
+                <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-group"><label>Prix (€)</label><input type="number" id="form-p-price" class="form-control"></div>
+                    <div class="form-group"><label>Stock</label><input type="number" id="form-p-stock" class="form-control"></div>
+                </div>
+                <div class="form-group"><label>Catégorie</label><select id="form-p-category" class="form-control"></select></div>
+                <div class="form-group"><label>URL de l'image</label><input type="text" id="form-p-image" class="form-control"></div>
+                <div class="form-group"><label>Description</label><textarea id="form-p-desc" class="form-control" style="height:80px;"></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeProductModal()">Annuler</button>
+                <button class="btn btn-primary" onclick="saveProductFromForm()">Confirmer</button>
             </div>
         </div>
     </div>
 
-    <div class="settings-drawer glass-panel" id="app-settings-drawer">
-        <div class="drawer-header">
-            <h3 style="font-weight:700;"><i class="fa-solid fa-gear" style="color:var(--velix-blue);"></i> Mon Profil</h3>
-            <span style="font-size:24px; cursor:pointer;" onclick="closeSettingsDrawer()">&times;</span>
+    <div id="product-detail-modal" class="modal-mask hidden">
+        <div class="modal-window" style="max-width: 700px;">
+            <div class="modal-header">
+                <span id="detail-modal-title">Détails du produit</span>
+                <button onclick="closeProductDetailModal()" style="background:none; border:none; color:white; cursor:pointer;"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                <div style="background: #1c1c1f; padding: 16px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                    <img id="detail-modal-img" src="" style="max-width: 100%; max-height: 280px; object-fit: contain;">
+                </div>
+                <div style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <span id="detail-modal-cat" class="product-cat-tag"></span>
+                        <h2 id="detail-modal-name" style="font-size: 20px; margin-bottom: 12px;"></h2>
+                        <p id="detail-modal-desc" style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px; line-height: 1.5;"></p>
+                    </div>
+                    <div>
+                        <div style="margin-bottom: 12px;">
+                            <span style="font-size: 13px; color: var(--text-muted);">Disponibilité :</span>
+                            <span id="detail-modal-stock" style="font-weight: 700; font-size: 14px; margin-left: 6px;"></span>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 16px;">
+                            <span id="detail-modal-price" style="font-size: 24px; font-weight: 800; color: var(--primary);"></span>
+                            <div id="detail-modal-action-container" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div style="margin-bottom:20px;">
-            <label style="display:block; font-size:13px; color:var(--text-muted); margin-bottom:8px;">Changer votre Surnom (Pseudo) :</label>
-            <input type="text" id="edit-profile-nickname" class="chat-search-input" style="margin-bottom:20px;">
-        </div>
-        <button class="btn-primary" style="margin-bottom:15px;" onclick="updateUserProfileData()">Sauvegarder</button>
-        <button class="btn-secondary" style="width:100%; border-color:#FF3B30; color:#FF3B30;" onclick="closeSettingsDrawer(); disconnectSession();">Se déconnecter</button>
     </div>
 
-    <div class="accounts-modal" id="accounts-switch-modal">
-        <div class="accounts-box glass-panel">
-            <h3 style="font-weight:700; margin-bottom:20px;">Sessions enregistrées</h3>
-            <div id="local-accounts-list" style="margin-bottom:20px;"></div>
-            <button class="btn-secondary" style="width:100%; margin-bottom:10px;" onclick="initiateAddAccount()">Ajouter un compte</button>
-            <button class="btn-primary" style="background:rgba(255,255,255,0.08); color:white;" onclick="closeSwitchAccountModal()">Fermer</button>
+    <div id="staff-modal" class="modal-mask hidden">
+        <div class="modal-window">
+            <div class="modal-header">
+                <span id="staff-modal-title">Ajouter un membre staff</span>
+                <button onclick="closeStaffModal()" style="background:none; border:none; color:white; cursor:pointer;"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-content">
+                <input type="hidden" id="form-s-id">
+                <div class="form-group"><label>Adresse Mail</label><input type="email" id="form-s-email" class="form-control" placeholder="admin@ungriff.com"></div>
+                <div class="form-group"><label>Mot de passe</label><input type="password" id="form-s-password" class="form-control" placeholder="••••••••"></div>
+                <div class="form-group">
+                    <label>Rôle</label>
+                    <select id="form-s-role" class="form-control">
+                        <option value="ADMIN">Administrateur (Gestion Stock/Commandes)</option>
+                        <option value="FONDA">Fondateur (Accès Total)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeStaffModal()">Annuler</button>
+                <button class="btn btn-primary" onclick="saveStaffFromForm()">Enregistrer</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let databaseInstance = null;
-        let sessionActiveUser = null;
-        let selectedChatPeerId = null;
-        let mapInstance = null;
-        let activeStudioMode = 'video';
-        let localRegisteredAccounts = []; 
-        let liveStreamMediaObject = null;
-        const BOT_ID = 999999;
+        const OWNER_EMAIL = "m6739376@gmail.com";
 
-        window.addEventListener('DOMContentLoaded', () => {
-            establishIndexedDBConnection();
-            loadAccountsFromLocalStorage();
-        });
-
-        function establishIndexedDBConnection() {
-            const dbRequest = indexedDB.open('VelixSupremeV6DB', 6);
-            dbRequest.onupgradeneeded = function(event) {
-                const db = event.target.result;
-                if (!db.objectStoreNames.contains('users')) {
-                    const userStore = db.createObjectStore('users', { keyPath: 'id', autoIncrement: true });
-                    userStore.createIndex('username', 'username', { unique: true });
-                }
-                if (!db.objectStoreNames.contains('videos')) db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
-                if (!db.objectStoreNames.contains('messages')) db.createObjectStore('messages', { keyPath: 'id', autoIncrement: true });
-                if (!db.objectStoreNames.contains('comments')) db.createObjectStore('comments', { keyPath: 'id', autoIncrement: true });
-            };
-            dbRequest.onsuccess = function(event) {
-                databaseInstance = event.target.result;
-                seedAdminAccount();
-            };
+        if(!localStorage.getItem('ug_staff_accounts')) {
+            localStorage.setItem('ug_staff_accounts', JSON.stringify([
+                { id: "s1", email: OWNER_EMAIL, password: "", role: "FONDA" }
+            ]));
         }
 
-        async function seedAdminAccount() {
-            const transaction = databaseInstance.transaction(['users'], 'readwrite');
-            const store = transaction.objectStore('users');
-            const countReq = store.count();
-            countReq.onsuccess = async function() {
-                if (countReq.result === 0) {
-                    const hashed = await hashStringSHA256('mohamed');
-                    store.add({ username: 'admin', nickname: 'Fondateur', email: 'admin@velix.tv', password: hashed, isAdmin: true, followersList: [], followingList: [] });
-                }
-            };
+        const INITIAL_CATEGORIES = ["Pantalons", "T-shirts", "Pulls"];
+        const INITIAL_PRODUCTS = [
+            { id: "v1", name: "Hoodie Oversize Noir 'UNGRIFF'", price: 45, desc: "Coton premium épais, coupe moderne streetwear.", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400", stock: 40, category: "Pulls", sales: 120 },
+            { id: "v2", name: "Cargo Baggy Techwear Gris", price: 55, desc: "Pantalon multipoches avec sangles ajustables.", image: "https://images.unsplash.com/photo-1517423738875-5ce310acd3da?w=400", stock: 18, category: "Pantalons", sales: 95 },
+            { id: "v3", name: "T-Shirt Graphique Rouge Rave", price: 29, desc: "Impression sérigraphie haute qualité.", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=400", stock: 0, category: "T-shirts", sales: 140 }
+        ];
+
+        let state = {
+            categories: INITIAL_CATEGORIES,
+            products: JSON.parse(localStorage.getItem('ug_p_clothes')) || INITIAL_PRODUCTS,
+            orders: JSON.parse(localStorage.getItem('ug_o_clothes')) || [],
+            staff: JSON.parse(localStorage.getItem('ug_staff_accounts')),
+            cart: [],
+            favorites: [],
+            currentRole: "CLIENT",
+            currentUserEmail: "",
+            currentPage: "home",
+            currentAdminSubPage: "products",
+            selectedCategory: "All",
+            sortCriteria: "popular",
+            searchQuery: "",
+            editingProductId: null
+        };
+
+        window.onload = function() {
+            checkUserAuth();
+            checkAndCleanDeliveredOrdersOnLoad();
+        };
+
+        function checkUserAuth() {
+            const savedEmail = localStorage.getItem('ug_user_email');
+            if (savedEmail) {
+                applyUserRoleAndInit(savedEmail);
+            } else {
+                document.getElementById('ungriff-client-app').classList.add('hidden');
+                document.getElementById('ungriff-auth-screen').classList.remove('hidden');
+            }
         }
 
-        function loadAccountsFromLocalStorage() {
-            const saved = localStorage.getItem('velix_local_accounts_v6');
-            if(saved) localRegisteredAccounts = JSON.parse(saved);
+        function checkEmailField(val) {
+            const email = val.trim().toLowerCase();
+            const staffMem = state.staff.find(s => s.email === email);
+            if(staffMem && email !== OWNER_EMAIL) {
+                document.getElementById('auth-password-area').classList.remove('hidden');
+            } else {
+                document.getElementById('auth-password-area').classList.add('hidden');
+            }
         }
 
-        function saveAccountsToLocalStorage() {
-            localStorage.setItem('velix_local_accounts_v6', JSON.stringify(localRegisteredAccounts));
-        }
-
-        async function hashStringSHA256(stringPayload) {
-            const msgUint8 = new TextEncoder().encode(stringPayload);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        function navigateTo(targetViewId) {
-            document.querySelectorAll('.screen-view').forEach(v => v.classList.remove('active-view'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            const selectedView = document.getElementById(`view-${targetViewId}`);
-            if(selectedView) selectedView.classList.add('active-view');
-            if(document.getElementById(`nav-${targetViewId}`)) document.getElementById(`nav-${targetViewId}`).classList.add('active');
+        function handleAuthSubmit() {
+            const emailInput = document.getElementById('auth-email-input').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('auth-password-input').value;
             
-            document.querySelectorAll('video').forEach(v => { if(v.id !== 'modal-video-player') v.pause(); });
-            document.getElementById('user-dropdown').style.display = 'none';
-            closeSettingsDrawer();
+            if (!emailInput || !emailInput.includes('@')) {
+                alert("Veuillez entrer une adresse mail valide.");
+                return;
+            }
 
-            if (targetViewId === 'home') refreshShortsFeed();
-            if (targetViewId === 'chat') refreshChatSystem();
-            if (targetViewId === 'profile') displayPersonalProfile();
-            if (targetViewId === 'admin') refreshAdminPanel();
-            if (targetViewId === 'map') triggerMapDeployment();
+            const staffMem = state.staff.find(s => s.email === emailInput);
+            if(staffMem && emailInput !== OWNER_EMAIL) {
+                if(staffMem.password !== passwordInput) {
+                    alert("Mot de passe incorrect pour ce compte staff.");
+                    return;
+                }
+            }
+
+            localStorage.setItem('ug_user_email', emailInput);
+            applyUserRoleAndInit(emailInput);
         }
 
-        function toggleDropdownMenu() {
-            const menu = document.getElementById('user-dropdown');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function switchAuthView(showLogin) {
-            document.getElementById('login-module').style.display = showLogin ? 'block' : 'none';
-            document.getElementById('register-module').style.display = showLogin ? 'none' : 'block';
-        }
-
-        async function processRegister() {
-            const username = document.getElementById('reg-username').value.trim().toLowerCase();
-            const nickname = document.getElementById('reg-nickname').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value;
-
-            if(!username || !nickname || !email || !password) return alert("Le pseudo et tous les autres champs sont obligatoires.");
-            const encryptedPassword = await hashStringSHA256(password);
-            const transaction = databaseInstance.transaction(['users', 'messages'], 'readwrite');
-            const userStore = transaction.objectStore('users');
-            const messageStore = transaction.objectStore('messages');
+        function applyUserRoleAndInit(email) {
+            state.currentUserEmail = email;
+            const staffMem = state.staff.find(s => s.email === email);
             
-            const addReq = userStore.add({ username, nickname, email, password: encryptedPassword, isAdmin: false, followersList: [], followingList: [] });
-            addReq.onsuccess = (e) => { 
-                const newUserId = e.target.result;
-                messageStore.add({ senderId: BOT_ID, receiverId: newUserId, text: `Bienvenue sur Velix ! Découvrez notre système exclusif de partage d'écran communautaire en LIVE.`, read: false });
-                if(!localRegisteredAccounts.includes(username)) {
-                    localRegisteredAccounts.push(username);
-                    saveAccountsToLocalStorage();
-                }
-                alert("Inscription validée ! Vous pouvez vous connecter."); 
-                switchAuthView(true); 
-            };
-            addReq.onerror = () => alert("Identifiant déjà utilisé.");
+            if (staffMem) {
+                state.currentRole = staffMem.role;
+            } else {
+                state.currentRole = "CLIENT";
+            }
+
+            document.getElementById('ungriff-auth-screen').classList.add('hidden');
+            document.getElementById('ungriff-client-app').classList.remove('hidden');
+
+            const display = document.getElementById('user-logged-display');
+            if (state.currentRole === "FONDA") display.innerHTML = `👑 Fondateur (${email})`;
+            else if (state.currentRole === "ADMIN") display.innerHTML = `🛠️ Admin (${email})`;
+            else display.innerHTML = `👤 Client (${email})`;
+
+            if(state.currentRole === "FONDA") {
+                document.getElementById('menu-item-staff').classList.remove('hidden');
+            } else {
+                document.getElementById('menu-item-staff').classList.add('hidden');
+            }
+
+            commit();
+            changePage('home');
         }
 
-        async function processLogin() {
-            const identity = document.getElementById('login-identity').value.trim().toLowerCase();
-            const password = document.getElementById('login-password').value;
-
-            const encryptedAttemptPassword = await hashStringSHA256(password);
-            const transaction = databaseInstance.transaction(['users'], 'readonly');
-            transaction.objectStore('users').openCursor().onsuccess = function(e) {
-                const cursor = e.target.result;
-                if(cursor) {
-                    const user = cursor.value;
-                    if((user.username === identity || user.email === identity) && user.password === encryptedAttemptPassword) {
-                        sessionActiveUser = user;
-                        document.getElementById('auth-gateway').style.display = 'none';
-                        document.getElementById('global-username-display').textContent = `@${user.username}`;
-                        if(!localRegisteredAccounts.includes(user.username)) {
-                            localRegisteredAccounts.push(user.username);
-                            saveAccountsToLocalStorage();
-                        }
-                        if(user.isAdmin) document.getElementById('nav-admin').style.display = 'flex';
-                        checkUnreadNotifications();
-                        navigateTo('home');
-                        return;
-                    }
-                    cursor.continue();
-                } else {
-                    if(!sessionActiveUser) alert("Identifiants incorrects.");
-                }
-            };
+        function logOutUser() {
+            localStorage.removeItem('ug_user_email');
+            location.reload();
         }
 
-        function disconnectSession() {
-            sessionActiveUser = null;
-            document.getElementById('nav-admin').style.display = 'none';
-            document.getElementById('auth-gateway').style.display = 'flex';
+        function commit() {
+            localStorage.setItem('ug_p_clothes', JSON.stringify(state.products));
+            localStorage.setItem('ug_o_clothes', JSON.stringify(state.orders));
+            localStorage.setItem('ug_staff_accounts', JSON.stringify(state.staff));
+            updateBadgesAndUIElements();
         }
 
-        function openSwitchAccountModal() {
-            document.getElementById('user-dropdown').style.display = 'none';
-            const modal = document.getElementById('accounts-switch-modal');
-            const listContainer = document.getElementById('local-accounts-list');
-            listContainer.innerHTML = '';
-            modal.style.display = 'flex';
+        function updateBadgesAndUIElements() {
+            document.getElementById('cart-badge-count').textContent = state.cart.reduce((a, b) => a + b.qty, 0);
+            document.getElementById('fav-badge-count').textContent = state.favorites.length;
+            
+            const shortcut = document.getElementById('panel-access-shortcut');
+            const quickAdd = document.getElementById('quick-add-btn');
+            
+            if(["FONDA", "ADMIN"].includes(state.currentRole)) {
+                shortcut.classList.remove('hidden');
+                quickAdd.classList.remove('hidden');
+            } else {
+                shortcut.classList.add('hidden');
+                quickAdd.classList.add('hidden');
+            }
+        }
 
-            localRegisteredAccounts.forEach(username => {
-                const row = document.createElement('div');
-                row.className = 'account-selector-item chat-peer-item';
-                row.style.background = "rgba(255,255,255,0.04)";
-                row.textContent = `@${username}`;
-                row.onclick = () => { switchActiveSessionDirectly(username); };
-                listContainer.appendChild(row);
+        function openStaffPanel() {
+            document.getElementById('ungriff-client-app').classList.add('hidden');
+            document.getElementById('admin-panel-layout').classList.remove('hidden');
+            changeAdminSubPage('products');
+        }
+
+        function closeStaffPanel() {
+            document.getElementById('admin-panel-layout').classList.add('hidden');
+            document.getElementById('ungriff-client-app').classList.remove('hidden');
+            updateBadgesAndUIElements();
+        }
+
+        /* ACTIONS PAGES CLIENTS */
+        function changePage(page) {
+            state.currentPage = page;
+            const container = document.getElementById('client-view-container');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            renderCategoriesRibbon();
+
+            switch(page) {
+                case 'home':
+                    container.innerHTML = `
+                        <div class="hero-banner">
+                            <div class="hero-text">
+                                <h1>UNGRIFF — <span>DOMINEZ</span> LE STYLE</h1>
+                                <p>La collection streetwear exclusive d'UNGRIFF. Des fringues lourdes, des coupes baggy et de la qualité premium.</p>
+                                <button class="btn btn-primary" onclick="changePage('boutique')">Voir le catalogue <i data-lucide="chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="section-title">🔥 Les meilleures ventes</div>
+                        <div class="products-grid">${generateProductsGridMarkup(state.products.slice(0, 4))}</div>
+                    `;
+                    break;
+
+                case 'boutique':
+                    container.innerHTML = `
+                        <div class="section-title">🛍️ Collection UNGRIFF</div>
+                        <div class="shop-controls">
+                            <select class="form-control" style="width:180px; padding:8px;" onchange="setSortOrder(this.value)">
+                                <option value="popular">Trier par Popularité</option>
+                                <option value="low">Prix : Plus bas</option>
+                                <option value="high">Prix : Plus élevé</option>
+                            </select>
+                            <div id="results-counter-txt"></div>
+                        </div>
+                        <div class="products-grid" id="boutique-products-target"></div>
+                    `;
+                    applyFiltersAndRenderBoutique();
+                    break;
+
+                case 'favoris':
+                    const favs = state.products.filter(p => state.favorites.includes(p.id));
+                    container.innerHTML = `
+                        <div class="section-title">❤️ Liste de souhaits</div>
+                        ${favs.length === 0 ? '<p style="color:var(--text-muted)">Aucun favori.</p>' : `<div class="products-grid">${generateProductsGridMarkup(favs)}</div>`}
+                    `;
+                    break;
+
+                case 'panier':
+                    renderCartPage(container);
+                    break;
+
+                case 'profil':
+                    renderProfilPage(container);
+                    break;
+            }
+            lucide.createIcons();
+        }
+
+        function renderCategoriesRibbon() {
+            const menu = document.getElementById('categories-menu');
+            menu.innerHTML = `<li class="${state.selectedCategory === 'All' ? 'active' : ''}" onclick="selectCategoryFilter('All')">Tout le shop</li>`;
+            state.categories.forEach(c => {
+                menu.innerHTML += `<li class="${state.selectedCategory === c ? 'active' : ''}" onclick="selectCategoryFilter('${c}')">${c}</li>`;
             });
         }
 
-        function closeSwitchAccountModal() { document.getElementById('accounts-switch-modal').style.display = 'none'; }
-        function initiateAddAccount() { closeSwitchAccountModal(); disconnectSession(); }
-
-        function switchActiveSessionDirectly(targetUsername) {
-            const index = databaseInstance.transaction(['users'], 'readonly').objectStore('users').index('username');
-            index.get(targetUsername).onsuccess = (req) => {
-                if(req.target.result) {
-                    sessionActiveUser = req.target.result;
-                    document.getElementById('auth-gateway').style.display = 'none';
-                    document.getElementById('global-username-display').textContent = `@${sessionActiveUser.username}`;
-                    closeSwitchAccountModal();
-                    checkUnreadNotifications();
-                    navigateTo('home');
-                }
-            };
+        function selectCategoryFilter(cat) {
+            state.selectedCategory = cat;
+            changePage('boutique');
         }
 
-        /* Logic TikTok : Flux, Abonnements, Avance/Recul Vidéo, Commentaires */
-        function refreshShortsFeed() {
-            const target = document.getElementById('view-home');
-            target.innerHTML = '';
+        function instantSearch(val) {
+            state.searchQuery = val.trim().toLowerCase();
+            if(state.currentPage !== 'boutique') changePage('boutique');
+            else applyFiltersAndRenderBoutique();
+        }
 
-            const transaction = databaseInstance.transaction(['videos', 'users'], 'readonly');
-            const allUsersMap = {};
+        function setSortOrder(order) {
+            state.sortCriteria = order;
+            applyFiltersAndRenderBoutique();
+        }
+
+        function applyFiltersAndRenderBoutique() {
+            let list = [...state.products];
+            if(state.selectedCategory !== "All") list = list.filter(p => p.category === state.selectedCategory);
+            if(state.searchQuery) list = list.filter(p => p.name.toLowerCase().includes(state.searchQuery));
+
+            const target = document.getElementById('boutique-products-target');
+            if(target) {
+                target.innerHTML = generateProductsGridMarkup(list);
+                document.getElementById('results-counter-txt').textContent = `${list.length} article(s)`;
+            }
+            lucide.createIcons();
+        }
+
+        function generateProductsGridMarkup(productsArray) {
+            if(productsArray.length === 0) return `<p style="grid-column:1/-1; color:var(--text-muted); text-align:center;">Aucun vêtement disponible.</p>`;
+            return productsArray.map(p => {
+                const isFav = state.favorites.includes(p.id);
+                const isOut = p.stock <= 0;
+                return `
+                    <div class="product-card" onclick="openProductDetailModal('${p.id}')">
+                        <div class="product-img-holder">
+                            <img src="${p.image}">
+                            <div class="fav-toggle-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${p.id}')">
+                                <i data-lucide="heart" style="${isFav ? 'fill:var(--primary)' : ''}"></i>
+                            </div>
+                        </div>
+                        <div class="product-details">
+                            <span class="product-cat-tag">${p.category}</span>
+                            <h3 class="product-title-text">${p.name}</h3>
+                            <div class="product-price-row">
+                                <span class="price-current">${p.price} €</span>
+                                ${isOut ? '<span style="color:var(--danger); font-size:11px; font-weight:700; margin-left:auto;">RUPTURE</span>' : `<span style="color:var(--text-muted); font-size:11px; margin-left:auto;">Stock: ${p.stock}</span>`}
+                            </div>
+                            <button class="buy-btn" ${isOut ? 'disabled' : ''} onclick="event.stopPropagation(); addToCart('${p.id}')">
+                                <i data-lucide="shopping-cart"></i> ${isOut ? 'Rupture de Stock' : 'Ajouter'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openProductDetailModal(id) {
+            const p = state.products.find(prod => prod.id === id);
+            if(!p) return;
             
-            transaction.objectStore('users').openCursor().onsuccess = (e) => {
-                const cursor = e.target.result;
-                if(cursor) {
-                    allUsersMap[cursor.value.id] = cursor.value;
-                    cursor.continue();
-                } else {
-                    transaction.objectStore('videos').getAll().onsuccess = (ev) => {
-                        const list = ev.target.result || [];
-                        list.forEach(item => {
-                            const container = document.createElement('div');
-                            container.className = 'short-container';
-
-                            const wrapper = document.createElement('div');
-                            wrapper.className = 'short-video-wrapper';
-
-                            const video = document.createElement('video');
-                            video.src = item.blobUrl || '';
-                            video.loop = true;
-                            video.controls = true; // Permet de reculer la vidéo librement via l'interface native discrète
-                            wrapper.appendChild(video);
-
-                            const observer = new IntersectionObserver((entries) => {
-                                entries.forEach(entry => {
-                                    if(entry.isIntersecting) {
-                                        document.querySelectorAll('video').forEach(v => { if(v !== video) v.pause(); });
-                                        video.play().catch(()=>{});
-                                    } else {
-                                        video.pause();
-                                    }
-                                });
-                            }, { threshold: 0.6 });
-                            observer.observe(container);
-
-                            const sidebar = document.createElement('div');
-                            sidebar.className = 'short-sidebar-actions';
-
-                            const creatorData = allUsersMap[item.ownerId] || { nickname: 'U', username: 'inconnu', followersList: [] };
-                            const avatarBtn = document.createElement('div');
-                            avatarBtn.className = 'action-icon-btn';
-                            avatarBtn.style.fontSize = '14px';
-                            avatarBtn.style.fontWeight = 'bold';
-                            avatarBtn.textContent = creatorData.nickname.charAt(0).toUpperCase();
-                            
-                            if(item.ownerId !== sessionActiveUser.id) {
-                                const isFollowing = sessionActiveUser.followingList && sessionActiveUser.followingList.includes(item.ownerId);
-                                const followBadge = document.createElement('div');
-                                followBadge.className = `follow-badge-btn ${isFollowing ? 'following-active' : ''}`;
-                                followBadge.innerHTML = isFollowing ? `<i class="fa-solid fa-check"></i>` : `<i class="fa-solid fa-plus"></i>`;
-                                followBadge.onclick = (e) => {
-                                    e.stopPropagation();
-                                    toggleFollowCreator(item.ownerId, followBadge);
-                                };
-                                avatarBtn.appendChild(followBadge);
-                            }
-                            sidebar.appendChild(avatarBtn);
-
-                            const isLiked = item.likedBy && item.likedBy.includes(sessionActiveUser.id);
-                            const likeBtn = document.createElement('div');
-                            likeBtn.className = `action-icon-btn ${isLiked ? 'liked-active' : ''}`;
-                            likeBtn.innerHTML = `<i class="fa-solid fa-heart"></i>`;
-                            likeBtn.onclick = () => toggleLikeStatus(item.id, likeBtn);
-                            sidebar.appendChild(likeBtn);
-
-                            const commBtn = document.createElement('div');
-                            commBtn.className = `action-icon-btn`;
-                            commBtn.innerHTML = `<i class="fa-solid fa-comment"></i>`;
-                            commBtn.onclick = () => toggleTikTokComments(item.id, container);
-                            sidebar.appendChild(commBtn);
-
-                            wrapper.appendChild(sidebar);
-
-                            const meta = document.createElement('div');
-                            meta.className = 'short-meta-bottom';
-                            meta.innerHTML = `<h3 style="margin-bottom:4px; font-weight:700; color:var(--velix-blue);">${item.mode === 'stream' ? '🔴 LIVE - ' : ''}${creatorData.nickname}</h3><p style="font-size:14px; color:#eee;">${item.title || ''}</p>`;
-                            wrapper.appendChild(meta);
-
-                            // Section Commentaires Glassmorphism TikTok
-                            const overlay = document.createElement('div');
-                            overlay.className = 'comments-overlay glass-panel';
-                            overlay.innerHTML = `
-                                <div class="comments-header"><span>Commentaires</span><span style="cursor:pointer; font-size:20px;" onclick="this.parentElement.parentElement.style.display='none'">&times;</span></div>
-                                <div class="comments-list-container" id="coms-list-${item.id}"></div>
-                                <div class="comment-input-row">
-                                    <input type="text" id="com-input-${item.id}" class="chat-search-input" placeholder="Laisser un commentaire..." style="margin:0;">
-                                    <button class="btn-primary" style="width:auto; padding:0 20px;" onclick="postTikTokComment(${item.id})"><i class="fa-solid fa-paper-plane"></i></button>
-                                </div>
-                            `;
-                            wrapper.appendChild(overlay);
-
-                            container.appendChild(wrapper);
-                            target.appendChild(container);
-                        });
-                    };
-                }
-            };
-        }
-
-        function toggleFollowCreator(creatorId, element) {
-            const tx = databaseInstance.transaction(['users'], 'readwrite');
-            const store = tx.objectStore('users');
+            document.getElementById('detail-modal-name').textContent = p.name;
+            document.getElementById('detail-modal-cat').textContent = p.category;
+            document.getElementById('detail-modal-desc').textContent = p.desc || "Aucune description disponible pour cet article.";
+            document.getElementById('detail-modal-price').textContent = `${p.price} €`;
+            document.getElementById('detail-modal-img').src = p.image;
             
-            store.get(sessionActiveUser.id).onsuccess = (e) => {
-                const me = e.target.result;
-                if(!me.followingList) me.followingList = [];
-                
-                store.get(creatorId).onsuccess = (ev) => {
-                    const creator = ev.target.result;
-                    if(!creator.followersList) creator.followersList = [];
-
-                    if(me.followingList.includes(creatorId)) {
-                        me.followingList = me.followingList.filter(id => id !== creatorId);
-                        creator.followersList = creator.followersList.filter(id => id !== me.id);
-                        element.innerHTML = `<i class="fa-solid fa-plus"></i>`;
-                        element.classList.remove('following-active');
-                    } else {
-                        me.followingList.push(creatorId);
-                        creator.followersList.push(me.id);
-                        element.innerHTML = `<i class="fa-solid fa-check"></i>`;
-                        element.classList.add('following-active');
-                    }
-
-                    store.put(me);
-                    store.put(creator).onsuccess = () => {
-                        sessionActiveUser = me; 
-                    };
-                };
-            };
-        }
-
-        function toggleLikeStatus(videoId, element) {
-            const tx = databaseInstance.transaction(['videos'], 'readwrite');
-            const store = tx.objectStore('videos');
-            store.get(videoId).onsuccess = (e) => {
-                const data = e.target.result;
-                if(!data.likedBy) data.likedBy = [];
-                if(data.likedBy.includes(sessionActiveUser.id)) {
-                    data.likedBy = data.likedBy.filter(id => id !== sessionActiveUser.id);
-                    element.classList.remove('liked-active');
-                } else {
-                    data.likedBy.push(sessionActiveUser.id);
-                    element.classList.add('liked-active');
-                }
-                store.put(data);
-            };
-        }
-
-        function toggleTikTokComments(videoId, container) {
-            const overlay = container.querySelector('.comments-overlay');
-            if(overlay.style.display === 'flex') {
-                overlay.style.display = 'none';
+            const stockStatus = document.getElementById('detail-modal-stock');
+            const actionContainer = document.getElementById('detail-modal-action-container');
+            
+            if(p.stock <= 0) {
+                stockStatus.textContent = "Épuisé";
+                stockStatus.style.color = "var(--danger)";
+                actionContainer.innerHTML = `<button class="buy-btn" disabled style="margin-top:0;">Rupture</button>`;
             } else {
-                overlay.style.display = 'flex';
-                loadTikTokComments(videoId);
+                stockStatus.textContent = `${p.stock} unités restantes`;
+                stockStatus.style.color = "var(--success)";
+                actionContainer.innerHTML = `<button class="btn btn-primary" style="width:100%; font-size:12px;" onclick="addToCart('${p.id}'); closeProductDetailModal();">Ajouter au panier</button>`;
             }
+
+            document.getElementById('product-detail-modal').classList.remove('hidden');
+            lucide.createIcons();
         }
 
-        function loadTikTokComments(videoId) {
-            const box = document.getElementById(`coms-list-${videoId}`);
-            box.innerHTML = '';
+        function closeProductDetailModal() {
+            document.getElementById('product-detail-modal').classList.add('hidden');
+        }
+
+        function toggleFavorite(id) {
+            if(state.favorites.includes(id)) state.favorites = state.favorites.filter(f => f !== id);
+            else state.favorites.push(id);
+            commit();
+            changePage(state.currentPage);
+        }
+
+        function addToCart(id) {
+            const prod = state.products.find(p => p.id === id);
+            if(!prod || prod.stock <= 0) return;
             
-            const transaction = databaseInstance.transaction(['comments', 'users'], 'readonly');
-            const usersMap = {};
+            const existing = state.cart.find(i => i.id === id);
+            const currentQtyInCart = existing ? existing.qty : 0;
             
-            transaction.objectStore('users').openCursor().onsuccess = (e) => {
-                const cursor = e.target.result;
-                if(cursor) { usersMap[cursor.value.id] = cursor.value; cursor.continue(); }
-                else {
-                    transaction.objectStore('comments').getAll().onsuccess = (ev) => {
-                        const list = ev.target.result || [];
-                        const filtered = list.filter(c => c.videoId === videoId);
-                        filtered.forEach(c => {
-                            const author = usersMap[c.authorId] || { nickname: 'Anonyme' };
-                            const item = document.createElement('div');
-                            item.className = 'comment-item';
-                            item.innerHTML = `
-                                <div class="comment-avatar">${author.nickname.charAt(0).toUpperCase()}</div>
-                                <div class="comment-content-box">
-                                    <div class="comment-author">${author.nickname}</div>
-                                    <div style="color:#eee;">${c.text}</div>
-                                </div>
-                            `;
-                            box.appendChild(item);
-                        });
-                        box.scrollTop = box.scrollHeight;
-                    };
+            if(currentQtyInCart + 1 > prod.stock) {
+                alert(`Impossible d'ajouter plus d'articles. Le stock total maximal est de ${prod.stock} pces.`);
+                return;
+            }
+
+            if(existing) existing.qty++;
+            else state.cart.push({ id: prod.id, name: prod.name, price: prod.price, image: prod.image, qty: 1 });
+            commit();
+            updateBadgesAndUIElements();
+        }
+
+        function adjustCartQty(id, modifier) {
+            const item = state.cart.find(i => i.id === id);
+            const prod = state.products.find(p => p.id === id);
+            if(item && prod) {
+                if(modifier > 0 && item.qty + 1 > prod.stock) {
+                    alert(`Action impossible : Stock maximal atteint (${prod.stock} pièces).`);
+                    return;
                 }
-            };
-        }
-
-        function postTikTokComment(videoId) {
-            const input = document.getElementById(`com-input-${videoId}`);
-            const text = input.value.trim();
-            if(!text) return;
-
-            const tx = databaseInstance.transaction(['comments'], 'readwrite');
-            tx.objectStore('comments').add({
-                videoId: videoId,
-                authorId: sessionActiveUser.id,
-                text: text,
-                timestamp: Date.now()
-            }).onsuccess = () => {
-                input.value = '';
-                loadTikTokComments(videoId);
-            };
-        }
-
-        /* Caméra / Mode exclusif Vidéo et Partage d'écran communautaire */
-        function setStudioMode(mode) {
-            activeStudioMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active-mode'));
-            document.getElementById(`mode-${mode}`).classList.add('active-mode');
-
-            if(mode === 'stream') {
-                document.getElementById('studio-upload-fields').style.display = 'none';
-                document.getElementById('studio-live-fields').style.display = 'block';
-                document.getElementById('studio-action-row').style.display = 'none';
-                document.getElementById('studio-placeholder-text').textContent = "Prêt pour la diffusion de votre écran.";
-            } else {
-                document.getElementById('studio-upload-fields').style.display = 'block';
-                document.getElementById('studio-live-fields').style.display = 'none';
-                document.getElementById('studio-action-row').style.display = 'flex';
-                document.getElementById('studio-placeholder-text').textContent = "Sélectionnez une vidéo depuis vos fichiers.";
+                item.qty += modifier;
+                if(item.qty <= 0) state.cart = state.cart.filter(i => i.id !== id);
+                commit();
+                changePage('panier');
             }
         }
 
-        function triggerFilePicker() { if(activeStudioMode === 'video') document.getElementById('video-file-input').click(); }
-
-        function handleStudioFileSelection(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const previewBox = document.getElementById('camera-frame-box');
-            previewBox.innerHTML = ''; 
-            const localVideo = document.createElement('video');
-            localVideo.src = URL.createObjectURL(file);
-            localVideo.muted = true; localVideo.autoplay = true; localVideo.loop = true;
-            localVideo.style.width = '100%'; localVideo.style.height = '100%'; localVideo.style.objectFit = 'cover';
-            previewBox.appendChild(localVideo);
-        }
-
-        async function startScreenShareBroadcast() {
-            try {
-                liveStreamMediaObject = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-                const previewBox = document.getElementById('camera-frame-box');
-                previewBox.innerHTML = '';
-                
-                const liveVideo = document.createElement('video');
-                liveVideo.srcObject = liveStreamMediaObject;
-                liveVideo.muted = true; liveVideo.autoplay = true;
-                liveVideo.style.width = '100%'; liveVideo.style.height = '100%'; liveVideo.style.objectFit = 'cover';
-                previewBox.appendChild(liveVideo);
-
-                document.getElementById('live-indicator-label').style.display = 'block';
-                document.getElementById('btn-stop-live').style.display = 'block';
-                
-                alert("Votre écran est actuellement partagé en LIVE à la communauté Velix !");
-            } catch (err) {
-                alert("Impossible d'activer le partage d'écran : " + err.message);
+        function renderCartPage(target) {
+            if(state.cart.length === 0) {
+                target.innerHTML = `<div class="dashboard-box" style="text-align:center;"><p style="color:var(--text-muted);">Votre panier est vide.</p></div>`;
+                return;
             }
+            let rows = ''; let total = 0;
+            state.cart.forEach(item => {
+                total += item.price * item.qty;
+                rows += `
+                    <div class="cart-row">
+                        <img src="${item.image}" class="cart-img">
+                        <div style="flex:1;">
+                            <h4>${item.name}</h4>
+                            <span style="color:var(--primary); font-weight:700;">${item.price} €</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <button class="btn btn-secondary" style="padding:4px 10px;" onclick="adjustCartQty('${item.id}', -1)">-</button>
+                            <span style="font-weight:700;">${item.qty}</span>
+                            <button class="btn btn-secondary" style="padding:4px 10px;" onclick="adjustCartQty('${item.id}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            target.innerHTML = `
+                <div class="section-title">🛒 Mon Panier</div>
+                <div class="split-layout">
+                    <div class="dashboard-box">${rows}</div>
+                    <div class="dashboard-box">
+                        <h3>Total : <span style="color:var(--primary);">${total} €</span></h3>
+                        <button class="btn btn-primary" style="width:100%; margin-top: 16px;" onclick="executeCheckoutOrder(${total})">Commander</button>
+                    </div>
+                </div>
+            `;
         }
 
-        function stopScreenShareBroadcast() {
-            if(liveStreamMediaObject) {
-                liveStreamMediaObject.getTracks().forEach(track => track.stop());
+        function executeCheckoutOrder(amount) {
+            let stockError = false;
+            state.cart.forEach(item => {
+                const p = state.products.find(prod => prod.id === item.id);
+                if(!p || p.stock < item.qty) stockError = true;
+            });
+
+            if(stockError) {
+                alert("Erreur lors de la validation : Un des articles n'est plus disponible en quantité suffisante.");
+                return;
             }
-            document.getElementById('live-indicator-label').style.display = 'none';
-            document.getElementById('btn-stop-live').style.display = 'none';
-            setStudioMode('video');
-            alert("LIVE arrêté.");
+
+            state.cart.forEach(item => {
+                const p = state.products.find(prod => prod.id === item.id);
+                p.stock -= item.qty;
+            });
+
+            state.orders.unshift({
+                id: "CMD-" + Math.floor(1000 + Math.random() * 9000),
+                user: state.currentUserEmail, total: amount, date: "08/06/2026", status: "En préparation",
+                items: state.cart.map(i => `${i.name} (x${i.qty})`).join(', '),
+                deliveredAt: null
+            });
+            state.cart = []; 
+            commit();
+            changePage('profil');
         }
 
-        function publishMediaContent() {
-            const title = document.getElementById('video-title-input').value.trim();
-            const fileInput = document.getElementById('video-file-input');
+        function renderProfilPage(target) {
+            let orderRows = state.orders.map(o => `
+                <tr>
+                    <td><code>${o.id}</code></td>
+                    <td>${o.items}</td>
+                    <td><strong>${o.total} €</strong></td>
+                    <td><span class="badge badge-fonda">${o.status}</span></td>
+                </tr>
+            `).join('');
 
-            if(!title || !fileInput.files[0]) return alert("Veuillez configurer un titre et choisir un fichier vidéo.");
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const tx = databaseInstance.transaction(['videos'], 'readwrite');
-                tx.objectStore('videos').add({
-                    ownerId: sessionActiveUser.id,
-                    title: title,
-                    blobUrl: e.target.result,
-                    mode: 'video',
-                    likedBy: [],
-                    timestamp: Date.now()
-                }).onsuccess = () => {
-                    alert("Vidéo publiée avec succès !");
-                    navigateTo('home');
-                };
-            };
-            reader.readAsDataURL(fileInput.files[0]);
+            target.innerHTML = `
+                <div class="section-title">👤 Espace Client</div>
+                <div class="split-layout">
+                    <div class="dashboard-box">
+                        <h3>Historique des commandes</h3>
+                        <table class="crm-table">
+                            <thead><tr><th>ID</th><th>Fringues</th><th>Prix</th><th>Statut</th></tr></thead>
+                            <tbody>${orderRows || '<tr><td colspan="4">Aucun achat pour le moment.</td></tr>'}</tbody>
+                        </table>
+                    </div>
+                    <div class="dashboard-box">
+                        <h3>Informations de session</h3>
+                        <p style="margin-bottom: 8px;"><strong>Email connecté :</strong> ${state.currentUserEmail}</p>
+                        <p><strong>Grade d'accès :</strong> ${state.currentRole}</p>
+                    </div>
+                </div>
+            `;
         }
 
-        /* Messagerie Instantanée & Effacement Immédiat des Notifications */
-        function refreshChatSystem() {
-            const query = document.getElementById('chat-search-input').value.trim().toLowerCase();
-            const usersTarget = document.getElementById('chat-users-list-target');
-            usersTarget.innerHTML = '';
-
-            const tx = databaseInstance.transaction(['users', 'messages'], 'readonly');
-            const unreadCountMap = {};
-
-            tx.objectStore('messages').getAll().onsuccess = (ev) => {
-                const msgs = ev.target.result || [];
-                msgs.forEach(m => {
-                    if(m.receiverId === sessionActiveUser.id && !m.read) {
-                        unreadCountMap[m.senderId] = (unreadCountMap[m.senderId] || 0) + 1;
+        /* BACK OFFICE — CONSOLE ADMINISTRATION */
+        function changeAdminSubPage(sub) {
+            state.currentAdminSubPage = sub;
+            document.querySelectorAll('.admin-nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`menu-item-${sub}`)?.classList.add('active');
+            const view = document.getElementById('admin-view-container');
+            
+            if(sub === 'products') {
+                let rows = state.products.map(p => `
+                    <tr>
+                        <td><strong>${p.name}</strong></td>
+                        <td><span class="badge badge-admin">${p.category}</span></td>
+                        <td><strong>${p.price} €</strong></td>
+                        <td>${p.stock <= 0 ? '<span style="color:var(--danger);font-weight:700;">RUPTURE</span>' : p.stock + ' pces'}</td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding:6px; font-size:12px;" onclick="openProductEditModal('${p.id}')">Modifier</button>
+                            <button class="btn btn-danger" style="padding:6px; font-size:12px;" onclick="deleteProduct('${p.id}')">Supprimer</button>
+                        </td>
+                    </tr>
+                `).join('');
+                view.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                        <h2>📦 Gestion du Stock Streetwear</h2>
+                        <button class="btn btn-primary" onclick="openAddProductModal()">+ Ajouter Vêtement</button>
+                    </div>
+                    <div class="dashboard-box"><table class="crm-table"><thead><tr><th>Article</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div>
+                `;
+            } else if(sub === 'orders') {
+                let oRows = state.orders.map(o => {
+                    let countdownTxt = "";
+                    if (o.status === "Livré" && o.deliveredAt) {
+                        const elapsed = Math.floor((Date.now() - o.deliveredAt) / 1000);
+                        const remaining = Math.max(0, 30 - elapsed);
+                        countdownTxt = ` <span style="color:var(--danger); font-size:11px; font-weight:700;">(Suppression dans ${remaining}s)</span>`;
                     }
-                });
-
-                tx.objectStore('users').openCursor().onsuccess = (e) => {
-                    const cursor = e.target.result;
-                    if(cursor) {
-                        const user = cursor.value;
-                        if(user.id !== sessionActiveUser.id) {
-                            if(!query || user.nickname.toLowerCase().includes(query)) {
-                                const row = document.createElement('div');
-                                row.className = `chat-peer-item ${selectedChatPeerId === user.id ? 'active-peer' : ''}`;
-                                
-                                const unreadBadge = unreadCountMap[user.id] ? `<span style="background:var(--velix-blue); padding:2px 7px; border-radius:10px; font-size:11px; color:black; font-weight:700;">${unreadCountMap[user.id]}</span>` : '';
-                                row.innerHTML = `<span>${user.nickname}</span> ${unreadBadge}`;
-                                
-                                row.onclick = () => {
-                                    selectedChatPeerId = user.id;
-                                    markMessagesAsRead(user.id); // Retire la notification immédiatement lors du clic
-                                };
-                                usersTarget.appendChild(row);
-                            }
-                        }
-                        cursor.continue();
-                    } else {
-                        streamConversationBubbles();
-                    }
-                };
-            };
+                    return `
+                    <tr>
+                        <td><code>${o.id}</code>${countdownTxt}</td>
+                        <td>${o.items}</td>
+                        <td>
+                            <select class="form-control" style="padding:4px;" onchange="updateOrderStatus('${o.id}', this.value)">
+                                <option value="En préparation" ${o.status==='En préparation'?'selected':''}>En préparation</option>
+                                <option value="En cours de livraison" ${o.status==='En cours de livraison'?'selected':''}>En cours</option>
+                                <option value="Livré" ${o.status==='Livré'?'selected':''}>Livré</option>
+                            </select>
+                        </td>
+                    </tr>
+                `}).join('');
+                view.innerHTML = `<h2>💼 Commandes Clients</h2><div class="dashboard-box"><table class="crm-table"><thead><tr><th>ID</th><th>Contenu</th><th>Statut</th></tr></thead><tbody>${oRows || '<tr><td colspan="3">Aucune commande active.</td></tr>'}</tbody></table></div>`;
+            } else if(sub === 'staff' && state.currentRole === 'FONDA') {
+                let sRows = state.staff.map(s => `
+                    <tr>
+                        <td><strong>${s.email}</strong></td>
+                        <td><span class="badge ${s.role === 'FONDA'?'badge-fonda':'badge-admin'}">${s.role}</span></td>
+                        <td><code>${s.email === OWNER_EMAIL ? 'Inamovible' : s.password}</code></td>
+                        <td>
+                            ${s.email === OWNER_EMAIL ? '-' : `
+                                <button class="btn btn-secondary" style="padding:6px; font-size:12px;" onclick="openStaffEditModal('${s.id}')">Modifier</button>
+                                <button class="btn btn-danger" style="padding:6px; font-size:12px;" onclick="deleteStaff('${s.id}')">Retirer</button>
+                            `}
+                        </td>
+                    </tr>
+                `).join('');
+                view.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                        <h2>👥 Gestion de l'Équipe Staff (Admins)</h2>
+                        <button class="btn btn-primary" onclick="openAddStaffModal()">+ Ajouter un Admin</button>
+                    </div>
+                    <div class="dashboard-box"><table class="crm-table"><thead><tr><th>E-mail</th><th>Rôle / Grade</th><th>Mot de passe</th><th>Actions</th></tr></thead><tbody>${sRows}</tbody></table></div>
+                `;
+            }
+            lucide.createIcons();
         }
 
-        function markMessagesAsRead(senderId) {
-            const tx = databaseInstance.transaction(['messages'], 'readwrite');
-            const store = tx.objectStore('messages');
-            store.openCursor().onsuccess = (e) => {
-                const cursor = e.target.result;
-                if(cursor) {
-                    const m = cursor.value;
-                    if(m.senderId === senderId && m.receiverId === sessionActiveUser.id && !m.read) {
-                        m.read = true;
-                        cursor.update(m);
-                    }
-                    cursor.continue();
+        /* SYSTÈME DE SUPPRESSION AUTO APRÈS LIVRAISON (30 SECONDES) */
+        function updateOrderStatus(id, val) {
+            const order = state.orders.find(o => o.id === id);
+            if(order) { 
+                order.status = val; 
+                if(val === "Livré") {
+                    order.deliveredAt = Date.now();
+                    // Lancer directement le compte à rebours de 30 secondes
+                    setTimeout(() => {
+                        removeOrderDefinitively(id);
+                    }, 30000);
                 } else {
-                    checkUnreadNotifications();
-                    refreshChatSystem();
+                    order.deliveredAt = null;
                 }
-            };
+                commit(); 
+                if(!document.getElementById('admin-panel-layout').classList.contains('hidden') && state.currentAdminSubPage === 'orders') {
+                    changeAdminSubPage('orders');
+                }
+            }
         }
 
-        function streamConversationBubbles() {
-            const box = document.getElementById('chat-messages-box-target');
-            const actions = document.getElementById('chat-header-actions');
-            const title = document.getElementById('chat-current-peer-name');
-            box.innerHTML = '';
+        function removeOrderDefinitively(id) {
+            state.orders = state.orders.filter(o => o.id !== id);
+            commit();
+            // Rafraîchir l'interface si l'admin regarde actuellement la liste des commandes
+            if(!document.getElementById('admin-panel-layout').classList.contains('hidden') && state.currentAdminSubPage === 'orders') {
+                changeAdminSubPage('orders');
+            }
+            if(state.currentPage === 'profil') {
+                changePage('profil');
+            }
+        }
 
-            if(!selectedChatPeerId) { actions.style.display = 'none'; return; }
-            actions.style.display = 'flex';
-
-            databaseInstance.transaction(['users'], 'readonly').objectStore('users').get(selectedChatPeerId).onsuccess = (e) => {
-                if(e.target.result) title.textContent = e.target.result.nickname;
-            };
-
-            const tx = databaseInstance.transaction(['messages'], 'readonly');
-            tx.objectStore('messages').getAll().onsuccess = (e) => {
-                const list = e.target.result || [];
-                list.forEach(m => {
-                    if((m.senderId === sessionActiveUser.id && m.receiverId === selectedChatPeerId) ||
-                       (m.senderId === selectedChatPeerId && m.receiverId === sessionActiveUser.id)) {
-                        const bubble = document.createElement('div');
-                        bubble.className = `msg-bubble ${m.senderId === sessionActiveUser.id ? 'me' : 'other'}`;
-                        bubble.textContent = m.text;
-                        box.appendChild(bubble);
+        // Permet de nettoyer les commandes qui ont été marquées livrées lors d'une session précédente
+        function checkAndCleanDeliveredOrdersOnLoad() {
+            let activeTimeout = false;
+            state.orders.forEach(o => {
+                if(o.status === "Livré" && o.deliveredAt) {
+                    const elapsed = Date.now() - o.deliveredAt;
+                    if(elapsed >= 30000) {
+                        state.orders = state.orders.filter(ord => ord.id !== o.id);
+                    } else {
+                        activeTimeout = true;
+                        setTimeout(() => { removeOrderDefinitively(o.id); }, 30000 - elapsed);
                     }
-                });
-                box.scrollTop = box.scrollHeight;
-            };
-        }
-
-        function handleChatKeyDown(event) { if(event.key === 'Enter') dispatchPrivateMessage(); }
-
-        function dispatchPrivateMessage() {
-            const input = document.getElementById('chat-message-payload');
-            const txt = input.value.trim();
-            if(!txt || !selectedChatPeerId) return;
-
-            const tx = databaseInstance.transaction(['messages'], 'readwrite');
-            tx.objectStore('messages').add({
-                senderId: sessionActiveUser.id,
-                receiverId: selectedChatPeerId,
-                text: txt,
-                timestamp: Date.now(),
-                read: false
-            }).onsuccess = () => {
-                input.value = '';
-                streamConversationBubbles();
-            };
-        }
-
-        function checkUnreadNotifications() {
-            if(!sessionActiveUser) return;
-            const tx = databaseInstance.transaction(['messages'], 'readonly');
-            tx.objectStore('messages').getAll().onsuccess = (e) => {
-                const list = e.target.result || [];
-                const unread = list.filter(m => m.receiverId === sessionActiveUser.id && !m.read).length;
-                const badge = document.getElementById('global-badge');
-                if(unread > 0) { badge.textContent = unread; badge.style.display = 'block'; }
-                else { badge.style.display = 'none'; }
-            };
-        }
-
-        /* Profil : Lecture et suppression définitive de vos Shorts */
-        function displayPersonalProfile() {
-            if(!sessionActiveUser) return;
+                }
+            });
+            if(activeTimeout) {
+                commit();
+            }
             
-            databaseInstance.transaction(['users'], 'readonly').objectStore('users').get(sessionActiveUser.id).onsuccess = (e) => {
-                const userObj = e.target.result;
-                if(userObj) sessionActiveUser = userObj;
-
-                document.getElementById('profile-display-username').textContent = `@${sessionActiveUser.username}`;
-                document.getElementById('profile-display-fullname').textContent = sessionActiveUser.nickname;
-                document.getElementById('profile-followers-count').textContent = sessionActiveUser.followersList ? sessionActiveUser.followersList.length : 0;
-                document.getElementById('profile-following-count').textContent = sessionActiveUser.followingList ? sessionActiveUser.followingList.length : 0;
-                
-                const gridTarget = document.getElementById('profile-videos-grid-target');
-                gridTarget.innerHTML = '';
-
-                const tx = databaseInstance.transaction(['videos'], 'readonly');
-                tx.objectStore('videos').getAll().onsuccess = (event) => {
-                    const list = event.target.result || [];
-                    const myVideos = list.filter(v => v.ownerId === sessionActiveUser.id);
-
-                    myVideos.forEach(v => {
-                        const card = document.createElement('div');
-                        card.className = 'grid-video-card';
-                        
-                        const vid = document.createElement('video');
-                        vid.src = v.blobUrl;
-                        card.appendChild(vid);
-
-                        card.onclick = () => openPersonalVideoModal(v);
-                        gridTarget.appendChild(card);
-                    });
-                };
-            };
-        }
-
-        function openPersonalVideoModal(videoItem) {
-            const modal = document.getElementById('personal-video-modal');
-            const player = document.getElementById('modal-video-player');
-            const delBtn = document.getElementById('btn-delete-current-video');
-
-            player.src = videoItem.blobUrl;
-            modal.style.display = 'flex';
-
-            delBtn.onclick = () => {
-                if(confirm("Voulez-vous supprimer définitivement cette vidéo de votre compte ?")) {
-                    const tx = databaseInstance.transaction(['videos'], 'readwrite');
-                    tx.objectStore('videos').delete(videoItem.id).onsuccess = () => {
-                        closePersonalVideoModal();
-                        displayPersonalProfile();
-                    };
+            // Boucle visuelle facultative : rafraîchit le timer sur le panel admin toutes les secondes si ouvert
+            setInterval(() => {
+                if(!document.getElementById('admin-panel-layout').classList.contains('hidden') && state.currentAdminSubPage === 'orders') {
+                    changeAdminSubPage('orders');
                 }
-            };
+            }, 1000);
         }
 
-        function closePersonalVideoModal() {
-            const modal = document.getElementById('personal-video-modal');
-            document.getElementById('modal-video-player').pause();
-            modal.style.display = 'none';
+        function deleteProduct(id) {
+            if(confirm("Supprimer l'article ?")) {
+                state.products = state.products.filter(p => p.id !== id); commit(); changeAdminSubPage('products');
+            }
         }
 
-        function openSettingsDrawer() { 
-            document.getElementById('edit-profile-nickname').value = sessionActiveUser.nickname;
-            document.getElementById('app-settings-drawer').classList.add('drawer-open'); 
-        }
-        function closeSettingsDrawer() { document.getElementById('app-settings-drawer').classList.remove('drawer-open'); }
-
-        function updateUserProfileData() {
-            const nick = document.getElementById('edit-profile-nickname').value.trim();
-            if(!nick) return alert("Le pseudo ne peut pas être vide.");
-            sessionActiveUser.nickname = nick;
-            const tx = databaseInstance.transaction(['users'], 'readwrite');
-            tx.objectStore('users').put(sessionActiveUser).onsuccess = () => {
-                closeSettingsDrawer();
-                displayPersonalProfile();
-            };
+        /* MODALS LOGIQUE */
+        function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
+        
+        function openAddProductModal() {
+            state.editingProductId = null;
+            document.getElementById('modal-title-action').textContent = "Ajouter un vêtement";
+            document.getElementById('form-p-name').value = '';
+            document.getElementById('form-p-price').value = '';
+            document.getElementById('form-p-stock').value = '';
+            document.getElementById('form-p-image').value = 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400';
+            document.getElementById('form-p-desc').value = '';
+            setupCategoryDropdownOptions();
+            document.getElementById('product-modal').classList.remove('hidden');
         }
 
-        function triggerMapDeployment() {
-            setTimeout(() => {
-                if(!mapInstance) {
-                    mapInstance = L.map('map-container').setView([46.2276, 2.2137], 5);
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(mapInstance);
-                } else { mapInstance.invalidateSize(); }
-            }, 250);
+        function openProductEditModal(id) {
+            const p = state.products.find(prod => prod.id === id);
+            if(!p) return;
+            state.editingProductId = id;
+            document.getElementById('modal-title-action').textContent = "Modifier l'article";
+            document.getElementById('form-p-name').value = p.name;
+            document.getElementById('form-p-price').value = p.price;
+            document.getElementById('form-p-stock').value = p.stock;
+            document.getElementById('form-p-image').value = p.image;
+            document.getElementById('form-p-desc').value = p.desc || '';
+            setupCategoryDropdownOptions(p.category);
+            document.getElementById('product-modal').classList.remove('hidden');
         }
 
-        function refreshAdminPanel() {
-            const tbody = document.getElementById('admin-users-tbody');
-            tbody.innerHTML = '';
-            databaseInstance.transaction(['users'], 'readonly').objectStore('users').openCursor().onsuccess = (e) => {
-                const cursor = e.target.result;
-                if(cursor) {
-                    const u = cursor.value;
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${u.id}</td><td>@${u.username}</td><td>${u.nickname}</td><td>${u.isAdmin ? 'Administrateur' : 'Membre'}</td>`;
-                    tbody.appendChild(row);
-                    cursor.continue();
+        function setupCategoryDropdownOptions(selectedVal = '') {
+            const select = document.getElementById('form-p-category');
+            select.innerHTML = state.categories.map(c => `<option value="${c}" ${c === selectedVal ? 'selected' : ''}>${c}</option>`).join('');
+        }
+
+        function saveProductFromForm() {
+            const name = document.getElementById('form-p-name').value.trim();
+            const price = parseFloat(document.getElementById('form-p-price').value);
+            const stock = parseInt(document.getElementById('form-p-stock').value);
+            const category = document.getElementById('form-p-category').value;
+            const image = document.getElementById('form-p-image').value;
+            const desc = document.getElementById('form-p-desc').value.trim();
+
+            if(!name || isNaN(price) || isNaN(stock)) return;
+
+            if(state.editingProductId) {
+                let p = state.products.find(prod => prod.id === state.editingProductId);
+                if(p) { p.name = name; p.price = price; p.stock = stock; p.category = category; p.image = image; p.desc = desc; }
+            } else {
+                state.products.unshift({ id: "p" + Date.now(), name, price, stock, category, image, desc, sales: 0 });
+            }
+            commit(); closeProductModal();
+            changeAdminSubPage('products');
+        }
+
+        /* ACTIONS SECTION BACK OFFICE STAFF */
+        function closeStaffModal() { document.getElementById('staff-modal').classList.add('hidden'); }
+        
+        function openAddStaffModal() {
+            document.getElementById('staff-modal-title').textContent = "Ajouter un membre Staff";
+            document.getElementById('form-s-id').value = "";
+            document.getElementById('form-s-email').value = "";
+            document.getElementById('form-s-password').value = "";
+            document.getElementById('form-s-role').value = "ADMIN";
+            document.getElementById('staff-modal').classList.remove('hidden');
+        }
+
+        function openStaffEditModal(id) {
+            const s = state.staff.find(st => st.id === id);
+            if(!s) return;
+            document.getElementById('staff-modal-title').textContent = "Modifier un membre Staff";
+            document.getElementById('form-s-id').value = s.id;
+            document.getElementById('form-s-email').value = s.email;
+            document.getElementById('form-s-password').value = s.password;
+            document.getElementById('form-s-role').value = s.role;
+            document.getElementById('staff-modal').classList.remove('hidden');
+        }
+
+        function saveStaffFromForm() {
+            const id = document.getElementById('form-s-id').value;
+            const email = document.getElementById('form-s-email').value.trim().toLowerCase();
+            const password = document.getElementById('form-s-password').value.trim();
+            const role = document.getElementById('form-s-role').value;
+
+            if(!email || !email.includes('@') || !password) {
+                alert("Veuillez remplir correctement les champs e-mail et mot de passe.");
+                return;
+            }
+
+            if(id) {
+                let s = state.staff.find(st => st.id === id);
+                if(s) { s.email = email; s.password = password; s.role = role; }
+            } else {
+                if(state.staff.find(st => st.email === email)) {
+                    alert("Cet utilisateur est déjà enregistré dans le staff.");
+                    return;
                 }
-            };
+                state.staff.push({ id: "s" + Date.now(), email, password, role });
+            }
+            commit();
+            closeStaffModal();
+            changeAdminSubPage('staff');
+        }
+
+        function deleteStaff(id) {
+            const target = state.staff.find(st => st.id === id);
+            if(target && target.email === OWNER_EMAIL) return; 
+            if(confirm("Voulez-vous vraiment retirer cet administrateur ?")) {
+                state.staff = state.staff.filter(st => st.id !== id);
+                commit();
+                changeAdminSubPage('staff');
+            }
         }
     </script>
 </body>
